@@ -1,0 +1,12 @@
+.idea/
+.tox/
+.pytest_cache/
+__pycache__/
+pip-wheel-metadata/
+dist/
+
+.coverage
+
+*.py[cod]
+*.egg-info
+*.whl
