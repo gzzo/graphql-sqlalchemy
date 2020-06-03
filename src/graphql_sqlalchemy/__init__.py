@@ -1,6 +1,6 @@
 from .schema import build_schema
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 ___all__ = [
     __version__,
