@@ -1,3 +1,6 @@
+[![PyPI version](https://badge.fury.io/py/graphql-sqlalchemy.svg)](https://badge.fury.io/py/graphql-sqlalchemy)
+[![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
+
 Generate GraphQL Schemas from your SQLAlchemy models
 
 # Install
