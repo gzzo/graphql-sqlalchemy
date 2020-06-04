@@ -17,10 +17,6 @@ classifiers = [
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8"
 ]
-packages = [
-    { include = "graphql_sqlalchemy", from = "src" },
-    { include = "tests", format = "sdist" },
-]
 
 [tool.poetry.dependencies]
 python = "<4,>=3.6.0"
@@ -49,5 +45,5 @@ envs = ["main"]
 from = {format = "poetry", path = "pyproject.toml"}
 
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry>=1,<2"]
 build-backend = "poetry.masonry.api"
