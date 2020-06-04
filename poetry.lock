@@ -132,7 +132,7 @@ requests = ">=2.7.9"
 [[package]]
 category = "dev"
 description = "Cross-platform colored terminal text."
-marker = "sys_platform == \"win32\" or platform_system == \"Windows\""
+marker = "platform_system == \"Windows\" or sys_platform == \"win32\""
 name = "colorama"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
@@ -903,8 +903,8 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [metadata]
-content-hash = "25fb8f2bde4d4ab399c1677d1ac3264eea831d9800a83650bdf082cc9e061fcb"
-python-versions = ">=3.6.0,<4"
+content-hash = "1841af1bf0cb49618af8062583c4cb007e44b8e36eaf92fc9fb4dc21c5b88753"
+python-versions = "<4,>=3.6.0"
 
 [metadata.files]
 aiohttp = [
