@@ -7,6 +7,7 @@ from graphql import (
     GraphQLField,
     GraphQLSchema,
     GraphQLList,
+    GraphQLInputObjectType,
 )
 
 from .resolvers import make_field_resolver, make_resolver, make_pk_resolver
@@ -40,15 +41,18 @@ def build_table_type(model: DeclarativeMeta, objects: Objects) -> GraphQLObjectT
 
 
 def build_schema(base: DeclarativeMeta) -> GraphQLSchema:
-    fields = {}
+    fields: Dict[str, GraphQLField] = {}
     objects: Dict[str, GraphQLObjectType] = {}
+    inputs: Dict[str, GraphQLInputObjectType] = {}
 
     for model in base.__subclasses__():
         field_name = get_table_name(model)
         object_type = build_table_type(model, objects)
 
         objects[field_name] = object_type
-        fields[field_name] = GraphQLField(GraphQLList(object_type), args=make_args(model), resolve=make_resolver(model))
+        fields[field_name] = GraphQLField(
+            GraphQLList(object_type), args=make_args(model, inputs=inputs), resolve=make_resolver(model)
+        )
 
         pk_field_name = get_model_pk_field_name(model)
         fields[pk_field_name] = GraphQLField(object_type, args=make_pk_args(model), resolve=make_pk_resolver(model))
