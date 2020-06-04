@@ -1,6 +1,5 @@
 from typing import Dict
 
-from sqlalchemy import Table
 from sqlalchemy.orm import interfaces
 from sqlalchemy.ext.declarative.api import DeclarativeMeta
 from graphql import (
@@ -12,21 +11,10 @@ from graphql import (
 
 from .resolvers import make_field_resolver, make_resolver, make_pk_resolver
 from .types import get_graphql_type_from_column
-from .args import make_pk_args
+from .args import make_args, make_pk_args
+from .names import get_model_pk_field_name, get_table_name
 
 Objects = Dict[str, GraphQLObjectType]
-
-
-def get_model_field_name(model: DeclarativeMeta) -> str:
-    return model.__tablename__  # type: ignore
-
-
-def get_model_pk_field_name(model: DeclarativeMeta) -> str:
-    return f"{model.__tablename__}_by_pk"  # type: ignore
-
-
-def get_table_object_name(table: Table) -> str:
-    return table.name.title().replace("_", "")
 
 
 def build_table_type(model: DeclarativeMeta, objects: Objects) -> GraphQLObjectType:
@@ -48,7 +36,7 @@ def build_table_type(model: DeclarativeMeta, objects: Objects) -> GraphQLObjectT
 
         return fields
 
-    return GraphQLObjectType(get_table_object_name(table), get_fields)
+    return GraphQLObjectType(get_table_name(model), get_fields)
 
 
 def build_schema(base: DeclarativeMeta) -> GraphQLSchema:
@@ -56,13 +44,13 @@ def build_schema(base: DeclarativeMeta) -> GraphQLSchema:
     objects: Dict[str, GraphQLObjectType] = {}
 
     for model in base.__subclasses__():
-        field_name = get_model_field_name(model)
+        field_name = get_table_name(model)
         object_type = build_table_type(model, objects)
 
         objects[field_name] = object_type
-        fields[field_name] = GraphQLField(GraphQLList(object_type), resolve=make_resolver(model))
+        fields[field_name] = GraphQLField(GraphQLList(object_type), args=make_args(model), resolve=make_resolver(model))
 
         pk_field_name = get_model_pk_field_name(model)
         fields[pk_field_name] = GraphQLField(object_type, args=make_pk_args(model), resolve=make_pk_resolver(model))
 
-    return GraphQLSchema(GraphQLObjectType("Query", lambda: fields))
+    return GraphQLSchema(GraphQLObjectType("Query", fields))
