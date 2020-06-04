@@ -1,5 +1,5 @@
 language: python
-matrix:
+jobs:
   include:
     - name: Code quality tests
       env: TOXENV=black,flake8,mypy
