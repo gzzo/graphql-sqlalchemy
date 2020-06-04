@@ -13,7 +13,6 @@ jobs:
   - name: Unit tests with Python 3.6
     env: TOXENV=py36
     python: 3.6
-  exclude:
   - stage: build
     script: poetry build
 cache:
