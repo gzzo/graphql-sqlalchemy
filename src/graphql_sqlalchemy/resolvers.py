@@ -1,6 +1,6 @@
 from functools import partial
 from itertools import starmap
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Callable, Dict, List, Union, Optional
 
 from sqlalchemy import Column, or_, and_, not_, true
 from sqlalchemy.sql import ClauseElement
@@ -9,7 +9,7 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 
 
 def make_field_resolver(field: str) -> Callable:
-    def resolver(root: DeclarativeMeta, _info: Any):
+    def resolver(root: DeclarativeMeta, _info: Any) -> Any:
         return getattr(root, field)
 
     return resolver
@@ -72,7 +72,7 @@ def get_filter_operation(model: DeclarativeMeta, where: Dict[str, Any]) -> Claus
     return true()
 
 
-def filter_query(model: DeclarativeMeta, query: Query, where: Dict[str, Any] = None) -> Query:
+def filter_query(model: DeclarativeMeta, query: Query, where: Optional[Dict[str, Any]] = None) -> Query:
     if not where:
         return query
 
@@ -83,7 +83,7 @@ def filter_query(model: DeclarativeMeta, query: Query, where: Dict[str, Any] = N
     return query
 
 
-def order_query(model: DeclarativeMeta, query: Query, order: List[Dict[str, Any]] = None) -> Query:
+def order_query(model: DeclarativeMeta, query: Query, order: Optional[List[Dict[str, Any]]] = None) -> Query:
     if not order:
         return query
 
@@ -101,11 +101,11 @@ def make_resolver(model: DeclarativeMeta) -> Callable:
     def resolver(
         _root: DeclarativeMeta,
         info: Any,
-        where: Dict[str, Any] = None,
-        order: List[Dict[str, Any]] = None,
-        limit: int = None,
-        offset: int = None,
-    ):
+        where: Optional[Dict[str, Any]] = None,
+        order: Optional[List[Dict[str, Any]]] = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ) -> List[DeclarativeMeta]:
         session = info.context["session"]
         query = session.query(model)
 
@@ -124,7 +124,7 @@ def make_resolver(model: DeclarativeMeta) -> Callable:
 
 
 def make_pk_resolver(model: DeclarativeMeta) -> Callable:
-    def resolver(_root: DeclarativeMeta, info: Any, **kwargs: Dict[str, Any]):
+    def resolver(_root: DeclarativeMeta, info: Any, **kwargs: Dict[str, Any]) -> DeclarativeMeta:
         session = info.context["session"]
         return session.query(model).get(kwargs)
 
