@@ -18,7 +18,7 @@ jobs:
     python: 3.6
   - stage: deploy
     name: Deploy
-    script: poetry --build publish
+    script: poetry publish --build
     if: tag =~ ^v
     deploy:
       - provider: releases
