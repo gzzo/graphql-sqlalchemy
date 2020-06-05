@@ -15,10 +15,8 @@ from .types import get_graphql_type_from_column
 from .args import make_args, make_pk_args
 from .names import get_model_pk_field_name, get_table_name
 
-Objects = Dict[str, GraphQLObjectType]
 
-
-def build_table_type(model: DeclarativeMeta, objects: Objects) -> GraphQLObjectType:
+def build_table_type(model: DeclarativeMeta, objects: Dict[str, GraphQLObjectType]) -> GraphQLObjectType:
     table = model.__table__  # type: ignore
 
     def get_fields():
@@ -29,7 +27,7 @@ def build_table_type(model: DeclarativeMeta, objects: Objects) -> GraphQLObjectT
             fields[column.name] = GraphQLField(graphql_type, resolve=make_field_resolver(column.name))
 
         for name, relationship in model.__mapper__.relationships.items():
-            object_type = objects[relationship.mapper.entity.__tablename__]
+            object_type = objects[get_table_name(relationship.mapper.entity)]
             if relationship.direction in (interfaces.ONETOMANY, interfaces.MANYTOMANY):
                 object_type = GraphQLList(object_type)
 
@@ -46,11 +44,10 @@ def build_schema(base: DeclarativeMeta) -> GraphQLSchema:
     inputs: Dict[str, GraphQLInputObjectType] = {}
 
     for model in base.__subclasses__():
-        field_name = get_table_name(model)
         object_type = build_table_type(model, objects)
 
-        objects[field_name] = object_type
-        fields[field_name] = GraphQLField(
+        objects[object_type.name] = object_type
+        fields[object_type.name] = GraphQLField(
             GraphQLList(object_type), args=make_args(model, inputs=inputs), resolve=make_resolver(model)
         )
 
