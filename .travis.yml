@@ -1,7 +1,8 @@
 language: python
 jobs:
   include:
-  - name: Code quality tests
+  - stage: test
+    name: Code quality tests
     env: TOXENV=black,flake8,mypy
     python: 3.8
   - name: Unit tests with Python 3.8
@@ -16,6 +17,7 @@ jobs:
     env: TOXENV=py36
     python: 3.6
   - stage: deploy
+    name: Deploy
     script: poetry --build publish
     if: (tag =~ ^v) AND (branch = master)
     deploy:
@@ -28,7 +30,7 @@ cache:
   - "$HOME/.cache/pip"
   - "$TRAVIS_BUILD_DIR/.tox"
 install:
-- pip install "poetry>=1,<2"
-- poetry install
+  - pip install "poetry>=1,<2"
+  - poetry install
 script:
-- tox -e $TOXENV
+  - tox -e $TOXENV
