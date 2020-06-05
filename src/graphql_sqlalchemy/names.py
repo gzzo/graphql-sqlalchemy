@@ -1,9 +1,11 @@
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from graphql import GraphQLScalarType
 
+from .helpers import get_table
+
 
 def get_table_name(model: DeclarativeMeta) -> str:
-    return model.__tablename__  # type: ignore
+    return get_table(model).name
 
 
 def get_model_pk_field_name(model: DeclarativeMeta) -> str:
@@ -26,9 +28,9 @@ def get_model_insert_input_name(model: DeclarativeMeta) -> str:
     return f"{get_table_name(model)}_insert_input"
 
 
-def get_model_insert_object_name(model) -> str:
+def get_model_insert_object_name(model: DeclarativeMeta) -> str:
     return f"insert_{get_table_name(model)}"
 
 
-def get_model_mutation_response_object_name(model) -> str:
+def get_model_mutation_response_object_name(model: DeclarativeMeta) -> str:
     return f"{get_table_name(model)}_mutation_response"

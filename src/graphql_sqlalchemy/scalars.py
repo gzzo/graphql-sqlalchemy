@@ -1,3 +1,5 @@
+from typing import Dict
+
 from sqlalchemy import Integer, Float, Boolean, Column
 from graphql import (
     GraphQLString,
@@ -24,7 +26,7 @@ def get_graphql_type_from_column(column: Column) -> GraphQLScalarType:
     return GraphQLString
 
 
-def get_base_comparison_fields(scalar: GraphQLScalarType):
+def get_base_comparison_fields(scalar: GraphQLScalarType) -> Dict[str, GraphQLInputField]:
     return {
         "_eq": GraphQLInputField(scalar),
         "_neq": GraphQLInputField(scalar),
@@ -38,5 +40,5 @@ def get_base_comparison_fields(scalar: GraphQLScalarType):
     }
 
 
-def get_string_comparison_fields():
+def get_string_comparison_fields() -> Dict[str, GraphQLInputField]:
     return {"_like": GraphQLInputField(GraphQLString), "_nlike": GraphQLInputField(GraphQLString)}
