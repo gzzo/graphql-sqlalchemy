@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "graphql-sqlalchemy"
-version = "0.3.1"
+version = "0.3.2"
 description = "Generate GraphQL Schemas from your SQLAlchemy models"
 license = "MIT"
 authors = ["Guido Rainuzzo <hi@guido.nyc>"]
@@ -34,6 +34,7 @@ mypy = ">=0.780"
 codecov = ">=2.1.4"
 tox = ">=3.15.1"
 sqlalchemy-stubs = ">=0.3"
+
 
 
 
