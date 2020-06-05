@@ -24,7 +24,11 @@ def make_where_type(model: DeclarativeMeta, inputs: Dict[str, GraphQLInputObject
     type_name = get_model_where_input_name(model)
 
     def get_fields():
-        fields = {}
+        fields = {
+            "_and": GraphQLList(inputs[type_name]),
+            "_or": GraphQLList(inputs[type_name]),
+            "_not": inputs[type_name],
+        }
 
         for column in model.__table__.columns:  # type: ignore
             fields[column.name] = GraphQLInputField(get_comparison_object_type(column, inputs))

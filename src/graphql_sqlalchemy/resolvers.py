@@ -1,5 +1,9 @@
-from typing import Any, Callable, Dict, List
+from functools import partial
+from itertools import starmap
+from typing import Any, Callable, Dict, List, Union
 
+from sqlalchemy import Column, or_, and_, not_, true
+from sqlalchemy.sql import ClauseElement
 from sqlalchemy.orm import Query
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
@@ -11,37 +15,70 @@ def make_field_resolver(field: str) -> Callable:
     return resolver
 
 
+def get_bool_operation(model_property: Column, operator: str, value: Any) -> Union[bool, ClauseElement]:
+    if operator == "_eq":
+        return model_property == value
+
+    if operator == "_in":
+        return model_property.in_(value)
+
+    if operator == "_is_null":
+        return model_property.is_(None)
+
+    if operator == "_like":
+        return model_property.like(value)
+
+    if operator == "_neq":
+        return model_property != value
+
+    if operator == "_nin":
+        return model_property.notin_(value)
+
+    if operator == "_nlike":
+        return model_property.notlike(value)
+
+    if operator == "_lt":
+        return model_property < value
+
+    if operator == "_gt":
+        return model_property > value
+
+    if operator == "_lte":
+        return model_property <= value
+
+    if operator == "_gte":
+        return model_property >= value
+
+    raise Exception("Invalid operator")
+
+
+def get_filter_operation(model: DeclarativeMeta, where: Dict[str, Any]) -> ClauseElement:
+    partial_filter = partial(get_filter_operation, model)
+
+    for name, exprs in where.items():
+        if name == "_or":
+            return or_(*map(partial_filter, exprs))
+
+        if name == "_not":
+            return not_(partial_filter(exprs))
+
+        if name == "_and":
+            return and_(*map(partial_filter, exprs))
+
+        model_property = getattr(model, name)
+        partial_bool = partial(get_bool_operation, model_property)
+        return and_(*(starmap(partial_bool, exprs.items())))
+
+    return true()
+
+
 def filter_query(model: DeclarativeMeta, query: Query, where: Dict[str, Any] = None) -> Query:
     if not where:
         return query
 
+    query_filter = getattr(query, "filter")
     for name, exprs in where.items():
-        model_property = getattr(model, name)
-        query_filter = getattr(query, "filter")
-
-        for operator, value in exprs.items():
-            if operator == "_eq":
-                query = query_filter(model_property == value)
-            elif operator == "_in":
-                query = query_filter(model_property.in_(value))
-            elif operator == "_is_null":
-                query = query_filter(model_property.is_(None))
-            elif operator == "_like":
-                query = query_filter(model_property.like(value))
-            elif operator == "_neq":
-                query = query_filter(model_property != value)
-            elif operator == "_nin":
-                query = query_filter(model_property.notin_(value))
-            elif operator == "_nlike":
-                query = query_filter(model_property.notlike(value))
-            elif operator == "_lt":
-                query = query_filter(model_property < value)
-            elif operator == "_gt":
-                query = query_filter(model_property > value)
-            elif operator == "_lte":
-                query = query_filter(model_property <= value)
-            elif operator == "_gte":
-                query = query_filter(model_property >= value)
+        query = query_filter(get_filter_operation(model, {name: exprs}))
 
     return query
 
