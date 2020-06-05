@@ -15,7 +15,6 @@ pip install graphql-sqlalchemy
 # Usage
 
 ```python
-from ariadne import QueryType
 from ariadne.asgi import GraphQL
 from fastapi import FastAPI
 from graphql_sqlalchemy import build_schema
@@ -25,11 +24,30 @@ from .base import Base
 
 
 app = FastAPI()
-query = QueryType()
 session = Session()
 
 schema = build_schema(Base)
-query.bind_to_schema(schema)
 
 app.mount("/graphql", GraphQL(schema, context_value=dict(session=session)))
+```
+
+# Query
+
+```graphql
+query MyQuery {
+    user(
+        where: {
+            _or: [
+                { id: { _gte: 5 } },
+                { name: { _like: "%bob%" } },
+            ]
+        }
+    ) {
+        id
+        name
+    }
+    model_by_pk(id: 5) {
+        createtime
+    }
+}
 ```
