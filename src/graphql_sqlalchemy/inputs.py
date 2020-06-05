@@ -11,7 +11,8 @@ from graphql import (
 )
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
-from .types import get_graphql_type_from_column, get_comparison_object_type
+from .scalars import get_graphql_type_from_column
+from .objects import get_comparison_object_type
 from .names import get_model_order_by_input_name, get_model_where_input_name
 
 

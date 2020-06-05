@@ -1,5 +1,3 @@
-from typing import Dict
-
 from sqlalchemy import Integer, Float, Boolean, Column
 from graphql import (
     GraphQLString,
@@ -10,7 +8,6 @@ from graphql import (
     GraphQLList,
     GraphQLNonNull,
     GraphQLScalarType,
-    GraphQLInputObjectType,
 )
 
 
@@ -41,19 +38,5 @@ def get_base_comparison_fields(scalar: GraphQLScalarType):
     }
 
 
-def get_comparison_object_type(column: Column, inputs: Dict[str, GraphQLInputObjectType]) -> GraphQLInputObjectType:
-    scalar = get_graphql_type_from_column(column)
-    type_name = f"{scalar.name.lower()}_comparison_exp"
-
-    if type_name in inputs:
-        return inputs[type_name]
-
-    fields = get_base_comparison_fields(scalar)
-
-    if scalar == GraphQLString:
-        fields.update({"_like": GraphQLInputField(GraphQLString), "_nlike": GraphQLInputField(GraphQLString)})
-
-    object_type = GraphQLInputObjectType(type_name, fields)
-    inputs[type_name] = object_type
-
-    return object_type
+def get_string_comparison_fields():
+    return {"_like": GraphQLInputField(GraphQLString), "_nlike": GraphQLInputField(GraphQLString)}
