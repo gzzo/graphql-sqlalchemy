@@ -17,8 +17,7 @@ jobs:
 #    python: 3.6
   - stage: deploy
     script: poetry --build publish
-    if:
-      (tag =~ ^v) AND (branch = master)
+    if: (tag =~ ^v) AND (branch = master)
     deploy:
       - provider: releases
         token:
