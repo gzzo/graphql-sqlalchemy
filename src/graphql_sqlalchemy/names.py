@@ -20,3 +20,15 @@ def get_model_where_input_name(model: DeclarativeMeta) -> str:
 
 def get_scalar_comparison_name(scalar: GraphQLScalarType) -> str:
     return f"{scalar.name.lower()}_comparison_exp"
+
+
+def get_model_insert_input_name(model: DeclarativeMeta) -> str:
+    return f"{get_table_name(model)}_insert_input"
+
+
+def get_model_insert_object_name(model) -> str:
+    return f"insert_{get_table_name(model)}"
+
+
+def get_model_mutation_response_object_name(model) -> str:
+    return f"{get_table_name(model)}_mutation_response"
