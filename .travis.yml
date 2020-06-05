@@ -19,7 +19,7 @@ jobs:
   - stage: deploy
     name: Deploy
     script: poetry --build publish
-    if: (tag =~ ^v) AND (branch = master)
+    if: tag =~ ^v
     deploy:
       - provider: releases
         token:
