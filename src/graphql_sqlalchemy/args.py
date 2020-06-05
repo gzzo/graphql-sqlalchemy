@@ -12,7 +12,7 @@ from graphql import (
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
 from .types import get_graphql_type_from_column, get_comparison_object_type
-from .names import get_table_name
+from .names import get_table_name, get_model_order_by_input_name
 
 
 PAGINATION_ARGS = {"limit": GraphQLInt, "offset": GraphQLInt}
@@ -29,14 +29,21 @@ def make_where_type(model: DeclarativeMeta, inputs: Dict[str, GraphQLInputObject
     return GraphQLInputObjectType(type_name, fields)
 
 
-def make_order_type(model: DeclarativeMeta) -> GraphQLInputObjectType:
-    type_name = f"{get_table_name(model)}_order_by"
-    fields = {}
+def make_order_type(model: DeclarativeMeta, inputs: Dict[str, GraphQLInputObjectType]) -> GraphQLInputObjectType:
+    type_name = get_model_order_by_input_name(model)
 
-    for column in model.__table__.columns:  # type: ignore
-        fields[column.name] = GraphQLInputField(ORDER_BY_ENUM)
+    def get_fields():
+        fields = {}
 
-    return GraphQLInputObjectType(type_name, fields)
+        for column in model.__table__.columns:  # type: ignore
+            fields[column.name] = GraphQLInputField(ORDER_BY_ENUM)
+
+        for name, relationship in model.__mapper__.relationships.items():
+            fields[name] = inputs[get_model_order_by_input_name(relationship.mapper.entity)]
+
+        return fields
+
+    return GraphQLInputObjectType(type_name, get_fields)
 
 
 def make_args(model: DeclarativeMeta, inputs: Dict[str, GraphQLInputObjectType]) -> Dict[str, GraphQLArgument]:
@@ -44,7 +51,9 @@ def make_args(model: DeclarativeMeta, inputs: Dict[str, GraphQLInputObjectType])
     for name, field in PAGINATION_ARGS.items():
         args[name] = GraphQLArgument(field)
 
-    args["order"] = GraphQLArgument(GraphQLList(GraphQLNonNull(make_order_type(model))))
+    order_type = make_order_type(model, inputs)
+    inputs[order_type.name] = order_type
+    args["order"] = GraphQLArgument(GraphQLList(GraphQLNonNull(order_type)))
     args["where"] = GraphQLArgument(make_where_type(model, inputs=inputs))
 
     return args
