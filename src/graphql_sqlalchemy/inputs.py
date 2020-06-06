@@ -35,10 +35,9 @@ def get_comparison_input_type(column: Column, inputs: Inputs) -> GraphQLInputObj
     if scalar == GraphQLString:
         fields.update(get_string_comparison_fields())
 
-    object_type = GraphQLInputObjectType(type_name, fields)
-    inputs[type_name] = object_type
-
-    return object_type
+    input_type = GraphQLInputObjectType(type_name, fields)
+    inputs[type_name] = input_type
+    return input_type
 
 
 def make_where_type(model: DeclarativeMeta, inputs: Inputs) -> GraphQLInputObjectType:
@@ -83,11 +82,17 @@ def make_order_type(model: DeclarativeMeta, inputs: Inputs) -> GraphQLInputObjec
     return input_type
 
 
-def make_insert_type(model: DeclarativeMeta) -> GraphQLInputObjectType:
+def get_insert_type(model: DeclarativeMeta, inputs: Inputs) -> GraphQLInputObjectType:
     type_name = get_model_insert_input_name(model)
+
+    if type_name in inputs:
+        return inputs[type_name]
+
     fields = {}
 
     for column in get_table(model).columns:
         fields[column.name] = GraphQLInputField(get_graphql_type_from_column(column))
 
-    return GraphQLInputObjectType(type_name, fields)
+    input_type = GraphQLInputObjectType(type_name, fields)
+    inputs[type_name] = input_type
+    return input_type

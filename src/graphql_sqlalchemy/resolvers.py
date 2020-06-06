@@ -97,7 +97,7 @@ def order_query(model: DeclarativeMeta, query: Query, order: Optional[List[Dict[
     return query
 
 
-def make_resolver(model: DeclarativeMeta) -> Callable:
+def make_object_resolver(model: DeclarativeMeta) -> Callable:
     def resolver(
         _root: DeclarativeMeta,
         info: Any,
@@ -127,5 +127,40 @@ def make_pk_resolver(model: DeclarativeMeta) -> Callable:
     def resolver(_root: DeclarativeMeta, info: Any, **kwargs: Dict[str, Any]) -> DeclarativeMeta:
         session = info.context["session"]
         return session.query(model).get(kwargs)
+
+    return resolver
+
+
+def make_insert_resolver(model: DeclarativeMeta) -> Callable:
+    def resolver(
+        _root: DeclarativeMeta, info: Any, objects: List[Dict[str, Any]]
+    ) -> Dict[str, Union[int, List[DeclarativeMeta]]]:
+        session = info.context["session"]
+        models = []
+        for obj in objects:
+            instance = model()
+            models.append(instance)
+            for key, value in obj.items():
+                setattr(instance, key, value)
+
+            session.add(instance)
+
+        session.commit()
+        return {"affected_rows": len(models), "returning": models}
+
+    return resolver
+
+
+def make_insert_one_resolver(model: DeclarativeMeta) -> Callable:
+    def resolver(_root: DeclarativeMeta, info: Any, object: Dict[str, Any]) -> DeclarativeMeta:
+        session = info.context["session"]
+
+        instance = model()
+        for key, value in object.items():
+            setattr(instance, key, value)
+
+        session.add(instance)
+        session.commit()
+        return instance
 
     return resolver
