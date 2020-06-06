@@ -1,3 +1,4 @@
+from sqlalchemy import Column
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from graphql import GraphQLScalarType
 
@@ -38,3 +39,22 @@ def get_model_insert_one_object_name(model: DeclarativeMeta) -> str:
 
 def get_model_mutation_response_object_name(model: DeclarativeMeta) -> str:
     return f"{get_table_name(model)}_mutation_response"
+
+
+def get_model_conflict_input_name(model: DeclarativeMeta) -> str:
+    return f"{get_table_name(model)}_on_conflict"
+
+
+def get_model_constraint_enum_name(model: DeclarativeMeta) -> str:
+    return f"{get_table_name(model)}_constraint"
+
+
+def get_model_constraint_key_name(model: DeclarativeMeta, column: Column, is_primary_key: bool = False) -> str:
+    if is_primary_key:
+        return f"{get_table_name(model)}_pkey"
+
+    return f"{get_table_name(model)}_{column.name}_key"
+
+
+def get_model_column_update_enum_name(model: DeclarativeMeta) -> str:
+    return f"{get_table_name(model)}_update_column"
