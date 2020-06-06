@@ -66,3 +66,23 @@ def get_model_delete_name(model: DeclarativeMeta) -> str:
 
 def get_model_delete_by_pk_name(model: DeclarativeMeta) -> str:
     return f"delete_{get_table_name(model)}_by_pk"
+
+
+def get_model_update_name(model: DeclarativeMeta) -> str:
+    return f"update_{get_table_name(model)}"
+
+
+def get_model_update_by_pk_name(model: DeclarativeMeta) -> str:
+    return f"update_{get_table_name(model)}_by_pk"
+
+
+def get_model_inc_input_type_name(model: DeclarativeMeta) -> str:
+    return f"{get_table_name(model)}_inc_input"
+
+
+def get_model_set_input_type_name(model: DeclarativeMeta) -> str:
+    return f"{get_table_name(model)}_set_input"
+
+
+def get_model_pk_columns_input_type_name(model: DeclarativeMeta) -> str:
+    return f"{get_table_name(model)}_pk_columns_input"

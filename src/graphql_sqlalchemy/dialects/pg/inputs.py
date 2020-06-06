@@ -15,7 +15,7 @@ from ...names import (
 )
 from ...types import Inputs
 from ...helpers import get_table
-from ...inputs import get_where_type
+from ...inputs import get_where_input_type
 
 
 def get_constraint_enum(model: DeclarativeMeta) -> GraphQLEnumType:
@@ -49,7 +49,7 @@ def get_conflict_type(model: DeclarativeMeta, inputs: Inputs) -> GraphQLInputObj
         "update_columns": GraphQLInputField(
             GraphQLNonNull(GraphQLList(GraphQLNonNull(get_update_column_enums(model))))
         ),
-        "where": GraphQLInputField(get_where_type(model, inputs)),
+        "where": GraphQLInputField(get_where_input_type(model, inputs)),
     }
 
     input_type = GraphQLInputObjectType(type_name, fields)

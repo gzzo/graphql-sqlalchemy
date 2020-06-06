@@ -14,6 +14,8 @@ from .resolvers import (
     make_insert_one_resolver,
     make_delete_resolver,
     make_delete_by_pk_resolver,
+    make_update_resolver,
+    make_update_by_pk_resolver,
 )
 from .args import (
     make_args,
@@ -21,6 +23,8 @@ from .args import (
     make_insert_args,
     make_insert_one_args,
     make_delete_args,
+    make_update_args,
+    make_update_by_pk_args,
 )
 from .names import (
     get_model_pk_field_name,
@@ -29,6 +33,8 @@ from .names import (
     get_table_name,
     get_model_delete_name,
     get_model_delete_by_pk_name,
+    get_model_update_name,
+    get_model_update_by_pk_name,
 )
 from .objects import build_object_type, build_mutation_response_type
 from .types import Objects, Inputs
@@ -67,10 +73,20 @@ def build_mutations(model: DeclarativeMeta, objects: Objects, mutations: GraphQL
         mutation_response_type, args=make_delete_args(model, inputs), resolve=make_delete_resolver(model)
     )
 
+    update_type_name = get_model_update_name(model)
+    mutations[update_type_name] = GraphQLField(
+        mutation_response_type, args=make_update_args(model, inputs), resolve=make_update_resolver(model)
+    )
+
     if get_table(model).primary_key:
         delete_by_pk_type_name = get_model_delete_by_pk_name(model)
         mutations[delete_by_pk_type_name] = GraphQLField(
             object_type, args=make_pk_args(model), resolve=make_delete_by_pk_resolver(model)
+        )
+
+        update_by_pk_type_name = get_model_update_by_pk_name(model)
+        mutations[update_by_pk_type_name] = GraphQLField(
+            object_type, args=make_update_by_pk_args(model, inputs), resolve=make_update_by_pk_resolver(model)
         )
 
 
