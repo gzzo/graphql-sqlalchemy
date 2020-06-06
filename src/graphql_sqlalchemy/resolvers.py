@@ -4,7 +4,7 @@ from typing import Any, Callable, Dict, List, Union, Optional
 
 from sqlalchemy import Column, or_, and_, not_, true
 from sqlalchemy.sql import ClauseElement
-from sqlalchemy.orm import Query
+from sqlalchemy.orm import Query, Session
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
 
@@ -131,36 +131,54 @@ def make_pk_resolver(model: DeclarativeMeta) -> Callable:
     return resolver
 
 
+def session_add_object(
+    obj: Dict[str, Any], model: DeclarativeMeta, session: Session, on_conflict: Optional[Dict[str, Any]] = None
+) -> DeclarativeMeta:
+    instance = model()
+    for key, value in obj.items():
+        setattr(instance, key, value)
+
+    if on_conflict and on_conflict["merge"]:
+        session.merge(instance)
+    else:
+        session.add(instance)
+    return instance
+
+
+def session_commit(session: Session) -> None:
+    try:
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
+
+
 def make_insert_resolver(model: DeclarativeMeta) -> Callable:
     def resolver(
-        _root: DeclarativeMeta, info: Any, objects: List[Dict[str, Any]]
+        _root: DeclarativeMeta, info: Any, objects: List[Dict[str, Any]], on_conflict: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Union[int, List[DeclarativeMeta]]]:
         session = info.context["session"]
         models = []
-        for obj in objects:
-            instance = model()
-            models.append(instance)
-            for key, value in obj.items():
-                setattr(instance, key, value)
 
-            session.add(instance)
+        with session.no_autoflush:
+            for obj in objects:
+                instance = session_add_object(obj, model, session, on_conflict)
+                models.append(instance)
 
-        session.commit()
+        session_commit(session)
         return {"affected_rows": len(models), "returning": models}
 
     return resolver
 
 
 def make_insert_one_resolver(model: DeclarativeMeta) -> Callable:
-    def resolver(_root: DeclarativeMeta, info: Any, object: Dict[str, Any]) -> DeclarativeMeta:
+    def resolver(
+        _root: DeclarativeMeta, info: Any, object: Dict[str, Any], on_conflict: Optional[Dict[str, Any]] = None
+    ) -> DeclarativeMeta:
         session = info.context["session"]
 
-        instance = model()
-        for key, value in object.items():
-            setattr(instance, key, value)
-
-        session.add(instance)
-        session.commit()
+        instance = session_add_object(object, model, session, on_conflict)
+        session_commit(session)
         return instance
 
     return resolver
