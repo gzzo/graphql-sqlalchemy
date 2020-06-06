@@ -19,24 +19,19 @@ PAGINATION_ARGS = {"limit": GraphQLInt, "offset": GraphQLInt}
 
 
 def make_args(model: DeclarativeMeta, inputs: Inputs) -> GraphQLArgumentMap:
-    args = {}
+    args = {
+        "order": GraphQLArgument(GraphQLList(GraphQLNonNull(get_order_type(model, inputs)))),
+        "where": GraphQLArgument(get_where_type(model, inputs)),
+    }
+
     for name, field in PAGINATION_ARGS.items():
         args[name] = GraphQLArgument(field)
-
-    order_type = get_order_type(model, inputs)
-    args["order"] = GraphQLArgument(GraphQLList(GraphQLNonNull(order_type)))
-
-    where_type = get_where_type(model, inputs)
-    args["where"] = GraphQLArgument(where_type)
 
     return args
 
 
-def make_pk_args(model: DeclarativeMeta) -> Optional[GraphQLArgumentMap]:
+def make_pk_args(model: DeclarativeMeta) -> GraphQLArgumentMap:
     primary_key = get_table(model).primary_key
-
-    if not primary_key:
-        return None
 
     args = {}
     for column in primary_key.columns:
@@ -58,3 +53,7 @@ def make_insert_one_args(model: DeclarativeMeta, inputs: Inputs) -> GraphQLArgum
         "object": GraphQLArgument(get_insert_type(model, inputs)),
         "on_conflict": GraphQLArgument(get_conflict_type(model, inputs)),
     }
+
+
+def make_delete_args(model: DeclarativeMeta, inputs: Inputs) -> GraphQLArgumentMap:
+    return {"where": GraphQLArgument(get_where_type(model, inputs))}

@@ -182,3 +182,33 @@ def make_insert_one_resolver(model: DeclarativeMeta) -> Callable:
         return instance
 
     return resolver
+
+
+def make_delete_resolver(model: DeclarativeMeta) -> Callable:
+    def resolver(
+        _root: DeclarativeMeta, info: Any, where: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Union[int, List[DeclarativeMeta]]]:
+        session = info.context["session"]
+        query = session.query(model)
+        query = filter_query(model, query, where)
+
+        rows = query.all()
+        affected = query.delete()
+        session.commit()
+
+        return {"affected_rows": affected, "returning": rows}
+
+    return resolver
+
+
+def make_delete_by_pk_resolver(model: DeclarativeMeta) -> Callable:
+    def resolver(_root: DeclarativeMeta, info: Any, **kwargs: Dict[str, Any]) -> List[DeclarativeMeta]:
+        session = info.context["session"]
+
+        row = session.query(model).get(kwargs)
+        session.delete(row)
+        session.commit()
+
+        return row
+
+    return resolver

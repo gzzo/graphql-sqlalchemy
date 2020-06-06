@@ -58,3 +58,11 @@ def get_model_constraint_key_name(model: DeclarativeMeta, column: Column, is_pri
 
 def get_model_column_update_enum_name(model: DeclarativeMeta) -> str:
     return f"{get_table_name(model)}_update_column"
+
+
+def get_model_delete_name(model: DeclarativeMeta) -> str:
+    return f"delete_{get_table_name(model)}"
+
+
+def get_model_delete_by_pk_name(model: DeclarativeMeta) -> str:
+    return f"delete_{get_table_name(model)}_by_pk"
