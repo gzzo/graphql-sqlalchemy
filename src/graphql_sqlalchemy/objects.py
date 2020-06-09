@@ -22,7 +22,10 @@ def build_object_type(model: DeclarativeMeta, objects: Objects) -> GraphQLObject
         fields = {}
 
         for column in get_table(model).columns:
-            graphql_type = get_graphql_type_from_column(column)
+            graphql_type: GraphQLOutputType = get_graphql_type_from_column(column)
+            if not column.nullable:
+                graphql_type = GraphQLNonNull(graphql_type)
+
             fields[column.name] = GraphQLField(graphql_type, resolve=make_field_resolver(column.name))
 
         for name, relationship in get_relationships(model):

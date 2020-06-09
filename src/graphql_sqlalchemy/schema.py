@@ -1,11 +1,5 @@
 from sqlalchemy.ext.declarative.api import DeclarativeMeta
-from graphql import (
-    GraphQLObjectType,
-    GraphQLField,
-    GraphQLFieldMap,
-    GraphQLSchema,
-    GraphQLList,
-)
+from graphql import GraphQLObjectType, GraphQLField, GraphQLFieldMap, GraphQLSchema, GraphQLList, GraphQLNonNull
 
 from .resolvers import (
     make_object_resolver,
@@ -46,7 +40,9 @@ def build_queries(model: DeclarativeMeta, objects: Objects, queries: GraphQLFiel
 
     objects[object_type.name] = object_type
     queries[object_type.name] = GraphQLField(
-        GraphQLList(object_type), args=make_args(model, inputs=inputs), resolve=make_object_resolver(model)
+        GraphQLNonNull(GraphQLList(GraphQLNonNull(object_type))),
+        args=make_args(model, inputs=inputs),
+        resolve=make_object_resolver(model),
     )
 
     if get_table(model).primary_key:
