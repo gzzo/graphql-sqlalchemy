@@ -97,4 +97,8 @@ def build_schema(base: DeclarativeMeta) -> GraphQLSchema:
         build_queries(model, objects, queries, inputs)
         build_mutations(model, objects, mutations, inputs)
 
-    return GraphQLSchema(GraphQLObjectType("Query", queries), GraphQLObjectType("Mutation", mutations))
+    return GraphQLSchema(
+        GraphQLObjectType("Query", queries),
+        GraphQLObjectType("Mutation", mutations),
+        GraphQLObjectType("Subscription", {}),
+    )
