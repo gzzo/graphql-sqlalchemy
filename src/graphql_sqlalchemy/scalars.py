@@ -1,8 +1,15 @@
 from typing import Dict
 
-from graphql import (GraphQLBoolean, GraphQLFloat, GraphQLInputField,
-                     GraphQLInt, GraphQLList, GraphQLNonNull,
-                     GraphQLScalarType, GraphQLString)
+from graphql import (
+    GraphQLBoolean,
+    GraphQLFloat,
+    GraphQLInputField,
+    GraphQLInt,
+    GraphQLList,
+    GraphQLNonNull,
+    GraphQLScalarType,
+    GraphQLString,
+)
 from sqlalchemy import Boolean, Column, Float, Integer
 
 

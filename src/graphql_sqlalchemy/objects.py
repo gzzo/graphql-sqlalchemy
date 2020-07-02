@@ -1,5 +1,12 @@
-from graphql import (GraphQLField, GraphQLFieldMap, GraphQLInt, GraphQLList,
-                     GraphQLNonNull, GraphQLObjectType, GraphQLOutputType)
+from graphql import (
+    GraphQLField,
+    GraphQLFieldMap,
+    GraphQLInt,
+    GraphQLList,
+    GraphQLNonNull,
+    GraphQLObjectType,
+    GraphQLOutputType,
+)
 from sqlalchemy import ARRAY
 from sqlalchemy.dialects.postgresql import ARRAY as PGARRAY
 from sqlalchemy.ext.declarative.api import DeclarativeMeta

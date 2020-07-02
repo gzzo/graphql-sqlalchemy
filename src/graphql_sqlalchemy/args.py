@@ -1,12 +1,16 @@
-from graphql import (GraphQLArgument, GraphQLArgumentMap, GraphQLInt,
-                     GraphQLList, GraphQLNonNull)
+from graphql import GraphQLArgument, GraphQLArgumentMap, GraphQLInt, GraphQLList, GraphQLNonNull
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
 from .helpers import get_table
-from .inputs import (get_conflict_input_type, get_inc_input_type,
-                     get_insert_input_type, get_order_input_type,
-                     get_pk_columns_input, get_set_input_type,
-                     get_where_input_type)
+from .inputs import (
+    get_conflict_input_type,
+    get_inc_input_type,
+    get_insert_input_type,
+    get_order_input_type,
+    get_pk_columns_input,
+    get_set_input_type,
+    get_where_input_type,
+)
 from .scalars import get_graphql_type_from_column
 from .types import Inputs
 
