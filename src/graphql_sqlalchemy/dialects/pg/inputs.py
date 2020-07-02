@@ -1,21 +1,14 @@
+from graphql import (GraphQLEnumType, GraphQLInputField,
+                     GraphQLInputObjectType, GraphQLList, GraphQLNonNull)
 from sqlalchemy.ext.declarative import DeclarativeMeta
-from graphql import (
-    GraphQLInputObjectType,
-    GraphQLList,
-    GraphQLEnumType,
-    GraphQLInputField,
-    GraphQLNonNull,
-)
 
-from ...names import (
-    get_model_conflict_input_name,
-    get_model_constraint_enum_name,
-    get_model_constraint_key_name,
-    get_model_column_update_enum_name,
-)
-from ...types import Inputs
 from ...helpers import get_table
 from ...inputs import get_where_input_type
+from ...names import (get_model_column_update_enum_name,
+                      get_model_conflict_input_name,
+                      get_model_constraint_enum_name,
+                      get_model_constraint_key_name)
+from ...types import Inputs
 
 
 def get_constraint_enum(model: DeclarativeMeta) -> GraphQLEnumType:

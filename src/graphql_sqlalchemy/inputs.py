@@ -1,30 +1,19 @@
-from sqlalchemy import Column, Integer, Float
+from graphql import (GraphQLBoolean, GraphQLEnumType, GraphQLInputField,
+                     GraphQLInputFieldMap, GraphQLInputObjectType, GraphQLList,
+                     GraphQLNonNull, GraphQLString)
+from sqlalchemy import Column, Float, Integer
 from sqlalchemy.ext.declarative import DeclarativeMeta
-from graphql import (
-    GraphQLInputObjectType,
-    GraphQLList,
-    GraphQLEnumType,
-    GraphQLInputField,
-    GraphQLString,
-    GraphQLInputFieldMap,
-    GraphQLNonNull,
-    GraphQLBoolean,
-)
 
-from .names import (
-    get_model_order_by_input_name,
-    get_model_where_input_name,
-    get_model_insert_input_name,
-    get_scalar_comparison_name,
-    get_model_conflict_input_name,
-    get_model_inc_input_type_name,
-    get_model_set_input_type_name,
-    get_model_pk_columns_input_type_name,
-)
-from .scalars import get_graphql_type_from_column, get_base_comparison_fields, get_string_comparison_fields
+from .helpers import get_relationships, get_table
+from .names import (get_model_conflict_input_name,
+                    get_model_inc_input_type_name, get_model_insert_input_name,
+                    get_model_order_by_input_name,
+                    get_model_pk_columns_input_type_name,
+                    get_model_set_input_type_name, get_model_where_input_name,
+                    get_scalar_comparison_name)
+from .scalars import (get_base_comparison_fields, get_graphql_type_from_column,
+                      get_string_comparison_fields)
 from .types import Inputs
-from .helpers import get_table, get_relationships
-
 
 ORDER_BY_ENUM = GraphQLEnumType("order_by", {"desc": "desc", "asc": "asc"})
 

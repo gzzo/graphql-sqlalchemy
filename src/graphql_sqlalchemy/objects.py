@@ -1,20 +1,15 @@
-from sqlalchemy.orm import interfaces
+from graphql import (GraphQLField, GraphQLFieldMap, GraphQLInt, GraphQLList,
+                     GraphQLNonNull, GraphQLObjectType, GraphQLOutputType)
+from sqlalchemy import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY as PGARRAY
 from sqlalchemy.ext.declarative.api import DeclarativeMeta
-from graphql import (
-    GraphQLObjectType,
-    GraphQLField,
-    GraphQLList,
-    GraphQLInt,
-    GraphQLNonNull,
-    GraphQLFieldMap,
-    GraphQLOutputType,
-)
+from sqlalchemy.orm import interfaces
 
+from .helpers import get_relationships, get_table
+from .names import get_model_mutation_response_object_name, get_table_name
 from .resolvers import make_field_resolver
 from .scalars import get_graphql_type_from_column
-from .names import get_table_name, get_model_mutation_response_object_name
 from .types import Objects
-from .helpers import get_table, get_relationships
 
 
 def build_object_type(model: DeclarativeMeta, objects: Objects) -> GraphQLObjectType:
@@ -25,6 +20,8 @@ def build_object_type(model: DeclarativeMeta, objects: Objects) -> GraphQLObject
             graphql_type: GraphQLOutputType = get_graphql_type_from_column(column)
             if not column.nullable:
                 graphql_type = GraphQLNonNull(graphql_type)
+            if isinstance(column.type, (ARRAY, PGARRAY)):
+                graphql_type = GraphQLList(graphql_type)
 
             fields[column.name] = GraphQLField(graphql_type, resolve=make_field_resolver(column.name))
 

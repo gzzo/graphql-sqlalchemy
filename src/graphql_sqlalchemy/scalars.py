@@ -1,16 +1,9 @@
 from typing import Dict
 
-from sqlalchemy import Integer, Float, Boolean, Column
-from graphql import (
-    GraphQLString,
-    GraphQLInt,
-    GraphQLFloat,
-    GraphQLBoolean,
-    GraphQLInputField,
-    GraphQLList,
-    GraphQLNonNull,
-    GraphQLScalarType,
-)
+from graphql import (GraphQLBoolean, GraphQLFloat, GraphQLInputField,
+                     GraphQLInt, GraphQLList, GraphQLNonNull,
+                     GraphQLScalarType, GraphQLString)
+from sqlalchemy import Boolean, Column, Float, Integer
 
 
 def get_graphql_type_from_column(column: Column) -> GraphQLScalarType:

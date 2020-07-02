@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Integer
 from graphql import GraphQLInt
+from sqlalchemy import Column, Integer
 
 from graphql_sqlalchemy.scalars import get_graphql_type_from_column
 

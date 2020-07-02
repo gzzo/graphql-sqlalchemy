@@ -1,6 +1,6 @@
+from graphql import GraphQLScalarType
 from sqlalchemy import Column
 from sqlalchemy.ext.declarative import DeclarativeMeta
-from graphql import GraphQLScalarType
 
 from .helpers import get_table
 
