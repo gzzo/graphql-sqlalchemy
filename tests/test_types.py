@@ -1,11 +1,10 @@
 from graphql import GraphQLInt
+from graphql_sqlalchemy.graphql_types import get_graphql_type_from_column
 from sqlalchemy import Column, Integer
-
-from graphql_sqlalchemy.scalars import get_graphql_type_from_column
 
 
 def describe_get_graphql_type_from_column() -> None:
     def handles_int() -> None:
         column = Column("name", Integer)
 
-        assert get_graphql_type_from_column(column) == GraphQLInt
+        assert get_graphql_type_from_column(column.type) == GraphQLInt
