@@ -1,8 +1,8 @@
 from typing import List, Tuple
 
 from sqlalchemy import Table
-from sqlalchemy.orm import Mapper, RelationshipProperty
 from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy.orm import Mapper, RelationshipProperty
 
 
 def get_table(model: DeclarativeMeta) -> Table:

@@ -1,6 +1,8 @@
+from typing import Union
+
+from graphql import GraphQLList, GraphQLScalarType
 from sqlalchemy import Column
 from sqlalchemy.ext.declarative import DeclarativeMeta
-from graphql import GraphQLScalarType
 
 from .helpers import get_table
 
@@ -21,8 +23,11 @@ def get_model_where_input_name(model: DeclarativeMeta) -> str:
     return f"{get_table_name(model)}_bool_exp"
 
 
-def get_scalar_comparison_name(scalar: GraphQLScalarType) -> str:
-    return f"{scalar.name.lower()}_comparison_exp"
+def get_graphql_type_comparison_name(graphql_type: Union[GraphQLList[GraphQLScalarType], GraphQLScalarType]) -> str:
+    if isinstance(graphql_type, GraphQLList):
+        return f"arr_{graphql_type.of_type.name.lower()}_comparison_exp"
+
+    return f"{graphql_type.name.lower()}_comparison_exp"
 
 
 def get_model_insert_input_name(model: DeclarativeMeta) -> str:

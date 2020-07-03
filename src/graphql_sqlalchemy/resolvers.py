@@ -1,11 +1,11 @@
 from functools import partial
 from itertools import starmap
-from typing import Any, Callable, Dict, List, Union, Optional
+from typing import Any, Callable, Dict, List, Optional, Union
 
-from sqlalchemy import Column, or_, and_, not_, true
-from sqlalchemy.sql import ClauseElement
-from sqlalchemy.orm import Query, Session
+from sqlalchemy import Column, and_, not_, or_, true
 from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy.orm import Query, Session
+from sqlalchemy.sql import ClauseElement
 
 
 def make_field_resolver(field: str) -> Callable:
