@@ -1,44 +1,43 @@
-from sqlalchemy import Column, Integer, Float
-from sqlalchemy.ext.declarative import DeclarativeMeta
 from graphql import (
-    GraphQLInputObjectType,
-    GraphQLList,
+    GraphQLBoolean,
     GraphQLEnumType,
     GraphQLInputField,
-    GraphQLString,
     GraphQLInputFieldMap,
+    GraphQLInputObjectType,
+    GraphQLList,
     GraphQLNonNull,
-    GraphQLBoolean,
+    GraphQLString,
 )
+from sqlalchemy import Column, Float, Integer
+from sqlalchemy.ext.declarative import DeclarativeMeta
 
+from .graphql_types import get_base_comparison_fields, get_graphql_type_from_column, get_string_comparison_fields
+from .helpers import get_relationships, get_table
 from .names import (
-    get_model_order_by_input_name,
-    get_model_where_input_name,
-    get_model_insert_input_name,
-    get_scalar_comparison_name,
+    get_graphql_type_comparison_name,
     get_model_conflict_input_name,
     get_model_inc_input_type_name,
-    get_model_set_input_type_name,
+    get_model_insert_input_name,
+    get_model_order_by_input_name,
     get_model_pk_columns_input_type_name,
+    get_model_set_input_type_name,
+    get_model_where_input_name,
 )
-from .scalars import get_graphql_type_from_column, get_base_comparison_fields, get_string_comparison_fields
 from .types import Inputs
-from .helpers import get_table, get_relationships
-
 
 ORDER_BY_ENUM = GraphQLEnumType("order_by", {"desc": "desc", "asc": "asc"})
 
 
 def get_comparison_input_type(column: Column, inputs: Inputs) -> GraphQLInputObjectType:
-    scalar = get_graphql_type_from_column(column)
-    type_name = get_scalar_comparison_name(scalar)
+    graphql_type = get_graphql_type_from_column(column.type)
+    type_name = get_graphql_type_comparison_name(graphql_type)
 
     if type_name in inputs:
         return inputs[type_name]
 
-    fields = get_base_comparison_fields(scalar)
+    fields = get_base_comparison_fields(graphql_type)
 
-    if scalar == GraphQLString:
+    if graphql_type == GraphQLString:
         fields.update(get_string_comparison_fields())
 
     inputs[type_name] = GraphQLInputObjectType(type_name, fields)
@@ -90,7 +89,7 @@ def get_order_input_type(model: DeclarativeMeta, inputs: Inputs) -> GraphQLInput
 def make_model_fields_input_type(model: DeclarativeMeta, type_name: str) -> GraphQLInputObjectType:
     fields = {}
     for column in get_table(model).columns:
-        fields[column.name] = GraphQLInputField(get_graphql_type_from_column(column))
+        fields[column.name] = GraphQLInputField(get_graphql_type_from_column(column.type))
 
     return GraphQLInputObjectType(type_name, fields)
 
@@ -126,7 +125,7 @@ def get_inc_input_type(model: DeclarativeMeta, inputs: Inputs) -> GraphQLInputOb
     fields = {}
     for column in get_table(model).columns:
         if isinstance(column.type, (Integer, Float)):
-            fields[column.name] = GraphQLInputField(get_graphql_type_from_column(column))
+            fields[column.name] = GraphQLInputField(get_graphql_type_from_column(column.type))
 
     inputs[type_name] = GraphQLInputObjectType(type_name, fields)
     return inputs[type_name]
@@ -147,6 +146,6 @@ def get_pk_columns_input(model: DeclarativeMeta) -> GraphQLInputObjectType:
 
     fields = {}
     for column in primary_key.columns:
-        fields[column.name] = GraphQLInputField(GraphQLNonNull(get_graphql_type_from_column(column)))
+        fields[column.name] = GraphQLInputField(GraphQLNonNull(get_graphql_type_from_column(column.type)))
 
     return GraphQLInputObjectType(type_name, fields)

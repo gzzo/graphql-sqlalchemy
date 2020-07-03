@@ -1,20 +1,20 @@
-from sqlalchemy.orm import interfaces
-from sqlalchemy.ext.declarative.api import DeclarativeMeta
 from graphql import (
-    GraphQLObjectType,
     GraphQLField,
-    GraphQLList,
-    GraphQLInt,
-    GraphQLNonNull,
     GraphQLFieldMap,
+    GraphQLInt,
+    GraphQLList,
+    GraphQLNonNull,
+    GraphQLObjectType,
     GraphQLOutputType,
 )
+from sqlalchemy.ext.declarative.api import DeclarativeMeta
+from sqlalchemy.orm import interfaces
 
+from .graphql_types import get_graphql_type_from_column
+from .helpers import get_relationships, get_table
+from .names import get_model_mutation_response_object_name, get_table_name
 from .resolvers import make_field_resolver
-from .scalars import get_graphql_type_from_column
-from .names import get_table_name, get_model_mutation_response_object_name
 from .types import Objects
-from .helpers import get_table, get_relationships
 
 
 def build_object_type(model: DeclarativeMeta, objects: Objects) -> GraphQLObjectType:
@@ -22,7 +22,7 @@ def build_object_type(model: DeclarativeMeta, objects: Objects) -> GraphQLObject
         fields = {}
 
         for column in get_table(model).columns:
-            graphql_type: GraphQLOutputType = get_graphql_type_from_column(column)
+            graphql_type: GraphQLOutputType = get_graphql_type_from_column(column.type)
             if not column.nullable:
                 graphql_type = GraphQLNonNull(graphql_type)
 

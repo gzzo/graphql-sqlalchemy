@@ -1,25 +1,18 @@
-from graphql import (
-    GraphQLArgument,
-    GraphQLNonNull,
-    GraphQLList,
-    GraphQLInt,
-    GraphQLArgumentMap,
-)
+from graphql import GraphQLArgument, GraphQLArgumentMap, GraphQLInt, GraphQLList, GraphQLNonNull
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
-from .scalars import get_graphql_type_from_column
+from .graphql_types import get_graphql_type_from_column
+from .helpers import get_table
 from .inputs import (
-    get_where_input_type,
-    get_order_input_type,
-    get_insert_input_type,
     get_conflict_input_type,
     get_inc_input_type,
-    get_set_input_type,
+    get_insert_input_type,
+    get_order_input_type,
     get_pk_columns_input,
+    get_set_input_type,
+    get_where_input_type,
 )
 from .types import Inputs
-from .helpers import get_table
-
 
 PAGINATION_ARGS = {"limit": GraphQLInt, "offset": GraphQLInt}
 
@@ -41,7 +34,7 @@ def make_pk_args(model: DeclarativeMeta) -> GraphQLArgumentMap:
 
     args = {}
     for column in primary_key.columns:
-        graphql_type = get_graphql_type_from_column(column)
+        graphql_type = get_graphql_type_from_column(column.type)
         args[column.name] = GraphQLArgument(GraphQLNonNull(graphql_type))
 
     return args

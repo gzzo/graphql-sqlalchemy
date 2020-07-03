@@ -1,38 +1,38 @@
+from graphql import GraphQLField, GraphQLFieldMap, GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLSchema
 from sqlalchemy.ext.declarative.api import DeclarativeMeta
-from graphql import GraphQLObjectType, GraphQLField, GraphQLFieldMap, GraphQLSchema, GraphQLList, GraphQLNonNull
 
-from .resolvers import (
-    make_object_resolver,
-    make_pk_resolver,
-    make_insert_resolver,
-    make_insert_one_resolver,
-    make_delete_resolver,
-    make_delete_by_pk_resolver,
-    make_update_resolver,
-    make_update_by_pk_resolver,
-)
 from .args import (
     make_args,
-    make_pk_args,
+    make_delete_args,
     make_insert_args,
     make_insert_one_args,
-    make_delete_args,
+    make_pk_args,
     make_update_args,
     make_update_by_pk_args,
 )
+from .helpers import get_table
 from .names import (
-    get_model_pk_field_name,
+    get_model_delete_by_pk_name,
+    get_model_delete_name,
     get_model_insert_object_name,
     get_model_insert_one_object_name,
-    get_table_name,
-    get_model_delete_name,
-    get_model_delete_by_pk_name,
-    get_model_update_name,
+    get_model_pk_field_name,
     get_model_update_by_pk_name,
+    get_model_update_name,
+    get_table_name,
 )
-from .objects import build_object_type, build_mutation_response_type
-from .types import Objects, Inputs
-from .helpers import get_table
+from .objects import build_mutation_response_type, build_object_type
+from .resolvers import (
+    make_delete_by_pk_resolver,
+    make_delete_resolver,
+    make_insert_one_resolver,
+    make_insert_resolver,
+    make_object_resolver,
+    make_pk_resolver,
+    make_update_by_pk_resolver,
+    make_update_resolver,
+)
+from .types import Inputs, Objects
 
 
 def build_queries(model: DeclarativeMeta, objects: Objects, queries: GraphQLFieldMap, inputs: Inputs) -> None:
