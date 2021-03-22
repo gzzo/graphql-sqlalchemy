@@ -10,3 +10,5 @@ dist/
 *.py[cod]
 *.egg-info
 *.whl
+
+docs/build

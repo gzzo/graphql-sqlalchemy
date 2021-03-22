@@ -215,7 +215,10 @@ def make_delete_by_pk_resolver(model: DeclarativeMeta) -> Callable:
 
 
 def update_query(
-    query: Query, model: DeclarativeMeta, _set: Optional[Dict[str, Any]], _inc: Optional[Dict[str, Any]],
+    query: Query,
+    model: DeclarativeMeta,
+    _set: Optional[Dict[str, Any]],
+    _inc: Optional[Dict[str, Any]],
 ) -> int:
     affected = 0
     if _inc:
@@ -233,7 +236,11 @@ def update_query(
 
 def make_update_resolver(model: DeclarativeMeta) -> Callable:
     def resolver(
-        _root: None, info: Any, where: Dict[str, Any], _set: Optional[Dict[str, Any]], _inc: Optional[Dict[str, Any]],
+        _root: None,
+        info: Any,
+        where: Dict[str, Any],
+        _set: Optional[Dict[str, Any]],
+        _inc: Optional[Dict[str, Any]],
     ) -> Dict[str, Union[int, List[DeclarativeMeta]]]:
         session = info.context["session"]
         query = session.query(model)

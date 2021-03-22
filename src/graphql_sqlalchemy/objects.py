@@ -1,3 +1,5 @@
+from sqlalchemy.orm import interfaces
+from sqlalchemy.orm.decl_api import DeclarativeMeta
 from graphql import (
     GraphQLField,
     GraphQLFieldMap,
