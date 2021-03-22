@@ -1,6 +1,5 @@
 from graphql import GraphQLField, GraphQLFieldMap, GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLSchema
-from graphql import GraphQLObjectType, GraphQLField, GraphQLFieldMap, GraphQLSchema, GraphQLList, GraphQLNonNull
-from sqlalchemy.orm.decl_api import DeclarativeMeta
+from sqlalchemy.ext.declarative import DeclarativeMeta
 
 from .args import (
     make_args,
@@ -87,7 +86,7 @@ def build_mutations(model: DeclarativeMeta, objects: Objects, mutations: GraphQL
         )
 
 
-def build_schema(base: DeclarativeMeta, enable_subscription=False) -> GraphQLSchema:
+def build_schema(base: DeclarativeMeta, enable_subscription: bool = False) -> GraphQLSchema:
     queries: GraphQLFieldMap = {}
     mutations: GraphQLFieldMap = {}
 

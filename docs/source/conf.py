@@ -42,7 +42,7 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
-pygments_style = 'solarizeddark'
+pygments_style = "solarizeddark"
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -53,7 +53,7 @@ pygments_style = 'solarizeddark'
 html_theme = "sphinx_rtd_theme"
 
 html_theme_options = {
-    'collapse_navigation': False,
+    "collapse_navigation": False,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

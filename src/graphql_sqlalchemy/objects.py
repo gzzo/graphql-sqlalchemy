@@ -1,5 +1,5 @@
 from sqlalchemy.orm import interfaces
-from sqlalchemy.orm.decl_api import DeclarativeMeta
+from sqlalchemy.ext.declarative import DeclarativeMeta
 from graphql import (
     GraphQLField,
     GraphQLFieldMap,
@@ -9,8 +9,6 @@ from graphql import (
     GraphQLObjectType,
     GraphQLOutputType,
 )
-from sqlalchemy.ext.declarative.api import DeclarativeMeta
-from sqlalchemy.orm import interfaces
 
 from .graphql_types import get_graphql_type_from_column
 from .helpers import get_relationships, get_table
