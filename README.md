@@ -15,26 +15,29 @@ pip install graphql-sqlalchemy
 # Usage
 
 ```python
-from ariadne.asgi import GraphQL
-from fastapi import FastAPI
-from graphql_sqlalchemy import build_schema
+    from ariadne.asgi import GraphQL
+    from fastapi import FastAPI
+    from sqlalchemy import create_engine
+    from sqlalchemy.ext.declarative import declarative_base
+    from sqlalchemy.orm import sessionmaker
+    from graphql_sqlalchemy import build_schema
 
-from .session import Session
-from .base import Base
+    engine = create_engine('sqlite:///config.db')
+    Base = declarative_base()
+    Session = sessionmaker(bind=engine)
 
+    app = FastAPI()
+    session = Session()
 
-app = FastAPI()
-session = Session()
+    schema = build_schema(Base)
 
-schema = build_schema(Base)
-
-app.mount("/graphql", GraphQL(schema, context_value=dict(session=session)))
+    app.mount("/graphql", GraphQL(schema, context_value=dict(session=session)))
 ```
 
 # Query
 
 ```graphql
-query MyQuery {
+query {
     user(
         where: {
             _or: [
@@ -46,7 +49,7 @@ query MyQuery {
         id
         name
     }
-    model_by_pk(id: 5) {
+    user_by_pk(id: 5) {
         createtime
     }
 }
