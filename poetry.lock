@@ -746,12 +746,12 @@ docs = ["sphinx", "jaraco.packaging (>=8.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "pytest-enabler", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [extras]
-docs = ["Sphinx"]
+docs = ["sphinx", "sphinx-rtd-theme", "pygments-graphql", "pygments-style-solarized"]
 
 [metadata]
 lock-version = "1.1"
 python-versions = "<4,>=3.6.0"
-content-hash = "fd63e1498d98ab604d20a56226cbdc1c739b1c008def36785102ffce16d5d7a1"
+content-hash = "547c0986e62adafc4dd7749ab7dc377496bdab69d177565aec0cab8258fe1b95"
 
 [metadata.files]
 alabaster = [
