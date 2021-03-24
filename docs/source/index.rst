@@ -24,3 +24,4 @@ GraphQL + SQLAlchemy <3
    :caption: Reference
 
    reference/query
+   reference/api
