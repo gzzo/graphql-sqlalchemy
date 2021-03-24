@@ -87,6 +87,15 @@ def build_mutations(model: DeclarativeMeta, objects: Objects, mutations: GraphQL
 
 
 def build_schema(base: DeclarativeMeta, enable_subscription: bool = False) -> GraphQLSchema:
+    """
+
+    Args:
+        base:
+        enable_subscription:
+
+    Returns: :class:`graphql:graphql.type.GraphQLSchema`
+
+    """
     queries: GraphQLFieldMap = {}
     mutations: GraphQLFieldMap = {}
 
