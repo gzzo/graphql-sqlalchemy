@@ -50,7 +50,7 @@ from = {format = "poetry", path = "pyproject.toml"}
 
 [tool.black]
 target-version = ['py36', 'py37', 'py38']
-line-length = 120
+line-length = 200
 
 [build-system]
 requires = ["poetry>=1,<2", "setuptools"]

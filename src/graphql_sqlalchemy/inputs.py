@@ -6,146 +6,101 @@ from graphql import (
     GraphQLInputObjectType,
     GraphQLList,
     GraphQLNonNull,
+    GraphQLScalarType,
     GraphQLString,
 )
-from sqlalchemy import Column, Float, Integer
-from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy import Float, Integer
 
-from .graphql_types import get_base_comparison_fields, get_graphql_type_from_column, get_string_comparison_fields
+from typing import Any, Union
+from .graphql_types import get_graphql_type_from_column
 from .helpers import get_relationships, get_table
-from .names import (
-    get_graphql_type_comparison_name,
-    get_model_conflict_input_name,
-    get_model_inc_input_type_name,
-    get_model_insert_input_name,
-    get_model_order_by_input_name,
-    get_model_pk_columns_input_type_name,
-    get_model_set_input_type_name,
-    get_model_where_input_name,
-)
+from .names import get_field_name
 from .types import Inputs
+
 
 ORDER_BY_ENUM = GraphQLEnumType("order_by", {"desc": "desc", "asc": "asc"})
 
 
-def get_comparison_input_type(column: Column, inputs: Inputs) -> GraphQLInputObjectType:
-    graphql_type = get_graphql_type_from_column(column.type)
-    type_name = get_graphql_type_comparison_name(graphql_type)
-
-    if type_name in inputs:
-        return inputs[type_name]
-
-    fields = get_base_comparison_fields(graphql_type)
-
-    if graphql_type == GraphQLString:
-        fields.update(get_string_comparison_fields())
-
-    inputs[type_name] = GraphQLInputObjectType(type_name, fields)
-    return inputs[type_name]
-
-
-def get_where_input_type(model: DeclarativeMeta, inputs: Inputs) -> GraphQLInputObjectType:
-    type_name = get_model_where_input_name(model)
-    if type_name in inputs:
-        return inputs[type_name]
-
-    def get_fields() -> GraphQLInputFieldMap:
-        fields = {
-            "_and": GraphQLInputField(GraphQLList(inputs[type_name])),
-            "_or": GraphQLInputField(GraphQLList(inputs[type_name])),
-            "_not": GraphQLInputField(inputs[type_name]),
-        }
-
-        for column in get_table(model).columns:
-            fields[column.name] = GraphQLInputField(get_comparison_input_type(column, inputs))
-
-        for name, relationship in get_relationships(model):
-            fields[name] = GraphQLInputField(inputs[get_model_where_input_name(relationship.mapper.entity)])
-
-        return fields
-
-    inputs[type_name] = GraphQLInputObjectType(type_name, get_fields)
-    return inputs[type_name]
-
-
-def get_order_input_type(model: DeclarativeMeta, inputs: Inputs) -> GraphQLInputObjectType:
-    type_name = get_model_order_by_input_name(model)
-
-    def get_fields() -> GraphQLInputFieldMap:
-        fields = {}
-
-        for column in get_table(model).columns:
-            fields[column.name] = GraphQLInputField(ORDER_BY_ENUM)
-
-        for name, relationship in get_relationships(model):
-            fields[name] = GraphQLInputField(inputs[get_model_order_by_input_name(relationship.mapper.entity)])
-
-        return fields
-
-    inputs[type_name] = GraphQLInputObjectType(type_name, get_fields)
-    return inputs[type_name]
-
-
-def make_model_fields_input_type(model: DeclarativeMeta, type_name: str) -> GraphQLInputObjectType:
-    fields = {}
-    for column in get_table(model).columns:
-        fields[column.name] = GraphQLInputField(get_graphql_type_from_column(column.type))
-
-    return GraphQLInputObjectType(type_name, fields)
-
-
-def get_insert_input_type(model: DeclarativeMeta, inputs: Inputs) -> GraphQLInputObjectType:
-    type_name = get_model_insert_input_name(model)
-    if type_name in inputs:
-        return inputs[type_name]
-
-    inputs[type_name] = make_model_fields_input_type(model, type_name)
-    return inputs[type_name]
-
-
-def get_conflict_input_type(model: DeclarativeMeta, inputs: Inputs) -> GraphQLInputObjectType:
-    type_name = get_model_conflict_input_name(model)
+def get_type_comparison_fields(graphql_type: Union[GraphQLScalarType, GraphQLList], inputs: Inputs, type_name: str) -> GraphQLInputObjectType:
     if type_name in inputs:
         return inputs[type_name]
 
     fields = {
-        "merge": GraphQLInputField(GraphQLNonNull(GraphQLBoolean)),
+        "_eq": GraphQLInputField(graphql_type),
+        "_neq": GraphQLInputField(graphql_type),
+        "_in": GraphQLInputField(GraphQLList(GraphQLNonNull(graphql_type))),
+        "_nin": GraphQLInputField(GraphQLList(GraphQLNonNull(graphql_type))),
+        "_lt": GraphQLInputField(graphql_type),
+        "_gt": GraphQLInputField(graphql_type),
+        "_gte": GraphQLInputField(graphql_type),
+        "_lte": GraphQLInputField(graphql_type),
+        "_is_null": GraphQLInputField(GraphQLBoolean),
     }
 
-    input_type = GraphQLInputObjectType(type_name, fields)
-    inputs[type_name] = input_type
-    return input_type
+    fields_string = {
+        "_like": GraphQLInputField(GraphQLString),
+        "_nlike": GraphQLInputField(GraphQLString),
+    }
 
-
-def get_inc_input_type(model: DeclarativeMeta, inputs: Inputs) -> GraphQLInputObjectType:
-    type_name = get_model_inc_input_type_name(model)
-    if type_name in inputs:
-        return inputs[type_name]
-
-    fields = {}
-    for column in get_table(model).columns:
-        if isinstance(column.type, (Integer, Float)):
-            fields[column.name] = GraphQLInputField(get_graphql_type_from_column(column.type))
+    if graphql_type == GraphQLString:
+        fields.update(fields_string)
 
     inputs[type_name] = GraphQLInputObjectType(type_name, fields)
     return inputs[type_name]
 
 
-def get_set_input_type(model: DeclarativeMeta, inputs: Inputs) -> GraphQLInputObjectType:
-    type_name = get_model_set_input_type_name(model)
+def get_input_type(model: Any, inputs: Inputs, input_type: Any) -> GraphQLInputObjectType:
+    type_name = get_field_name(model, input_type)
+
+    """ skip if field already exists """
     if type_name in inputs:
         return inputs[type_name]
 
-    inputs[type_name] = make_model_fields_input_type(model, type_name)
+    def get_fields() -> GraphQLInputFieldMap:
+        """ initial field population """
+        input_field = {
+            "where": {
+                "_and": GraphQLInputField(GraphQLList(inputs[type_name])),
+                "_or": GraphQLInputField(GraphQLList(inputs[type_name])),
+                "_not": GraphQLInputField(inputs[type_name]),
+            },
+            "on_conflict": {
+                "merge": GraphQLInputField(GraphQLNonNull(GraphQLBoolean)),
+            },
+        }
+
+        if input_type in input_field.keys():
+            fields = input_field[input_type]
+        else:
+            fields = {}
+
+        """ per column population """
+        for column in get_table(model).columns:
+            graphql_type = get_graphql_type_from_column(column.type)
+            column_type = GraphQLInputField(graphql_type)
+
+            input_field = {
+                "where": GraphQLInputField(get_type_comparison_fields(graphql_type, inputs, get_field_name(graphql_type, "comparison"))),  # type: ignore
+                "order_by": GraphQLInputField(ORDER_BY_ENUM),  # type: ignore
+                "insert_input": column_type,  # type: ignore
+                "inc_input": column_type if isinstance(column.type, (Integer, Float)) else None,  # type: ignore
+                "set_input": column_type,  # type: ignore
+            }
+
+            if input_type in input_field.keys() and input_field[input_type]:
+                fields[column.name] = input_field[input_type]  # type: ignore
+
+        """ relationship population """
+        for name, relationship in get_relationships(model):
+            input_field = {
+                "where": GraphQLInputField(inputs[get_field_name(relationship.mapper.entity, "where")]),  # type: ignore
+                "order_by": GraphQLInputField(inputs[get_field_name(relationship.mapper.entity, "order_by")]),  # type: ignore
+            }
+
+            if input_type in input_field.keys():
+                fields[name] = input_field[input_type]  # type: ignore
+
+        return fields
+
+    inputs[type_name] = GraphQLInputObjectType(type_name, get_fields)
     return inputs[type_name]
-
-
-def get_pk_columns_input(model: DeclarativeMeta) -> GraphQLInputObjectType:
-    type_name = get_model_pk_columns_input_type_name(model)
-    primary_key = get_table(model).primary_key
-
-    fields = {}
-    for column in primary_key.columns:
-        fields[column.name] = GraphQLInputField(GraphQLNonNull(get_graphql_type_from_column(column.type)))
-
-    return GraphQLInputObjectType(type_name, fields)

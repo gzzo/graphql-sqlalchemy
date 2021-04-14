@@ -1,12 +1,10 @@
-from typing import Dict, Union
+from typing import Union
 
 from graphql import (
     GraphQLBoolean,
     GraphQLFloat,
-    GraphQLInputField,
     GraphQLInt,
     GraphQLList,
-    GraphQLNonNull,
     GraphQLScalarType,
     GraphQLString,
 )
@@ -29,21 +27,3 @@ def get_graphql_type_from_column(column_type: TypeEngine) -> Union[GraphQLScalar
         return GraphQLList(get_graphql_type_from_column(column_type.item_type))
 
     return GraphQLString
-
-
-def get_base_comparison_fields(graphql_type: Union[GraphQLScalarType, GraphQLList]) -> Dict[str, GraphQLInputField]:
-    return {
-        "_eq": GraphQLInputField(graphql_type),
-        "_neq": GraphQLInputField(graphql_type),
-        "_in": GraphQLInputField(GraphQLList(GraphQLNonNull(graphql_type))),
-        "_nin": GraphQLInputField(GraphQLList(GraphQLNonNull(graphql_type))),
-        "_lt": GraphQLInputField(graphql_type),
-        "_gt": GraphQLInputField(graphql_type),
-        "_gte": GraphQLInputField(graphql_type),
-        "_lte": GraphQLInputField(graphql_type),
-        "_is_null": GraphQLInputField(GraphQLBoolean),
-    }
-
-
-def get_string_comparison_fields() -> Dict[str, GraphQLInputField]:
-    return {"_like": GraphQLInputField(GraphQLString), "_nlike": GraphQLInputField(GraphQLString)}

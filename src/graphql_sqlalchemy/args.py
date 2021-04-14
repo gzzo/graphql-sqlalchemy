@@ -2,73 +2,56 @@ from graphql import GraphQLArgument, GraphQLArgumentMap, GraphQLInt, GraphQLList
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
 from .graphql_types import get_graphql_type_from_column
-from .helpers import get_table
-from .inputs import (
-    get_conflict_input_type,
-    get_inc_input_type,
-    get_insert_input_type,
-    get_order_input_type,
-    get_pk_columns_input,
-    get_set_input_type,
-    get_where_input_type,
-)
+from .helpers import has_int, get_pk_columns
+from .inputs import get_input_type
 from .types import Inputs
+
 
 PAGINATION_ARGS = {"limit": GraphQLInt, "offset": GraphQLInt}
 
 
-def make_args(model: DeclarativeMeta, inputs: Inputs) -> GraphQLArgumentMap:
+def make_query_args(model: DeclarativeMeta, inputs: Inputs) -> GraphQLArgumentMap:
     args = {
-        "order": GraphQLArgument(GraphQLList(GraphQLNonNull(get_order_input_type(model, inputs)))),
-        "where": GraphQLArgument(get_where_input_type(model, inputs)),
+        "order": GraphQLArgument(GraphQLList(GraphQLNonNull(get_input_type(model, inputs, "order_by")))),
+        "where": GraphQLArgument(get_input_type(model, inputs, "where")),
+        **PAGINATION_ARGS,  # type: ignore
     }
-
-    for name, field in PAGINATION_ARGS.items():
-        args[name] = GraphQLArgument(field)
 
     return args
 
 
 def make_pk_args(model: DeclarativeMeta) -> GraphQLArgumentMap:
-    primary_key = get_table(model).primary_key
+    pk_columns = get_pk_columns(model)
 
-    args = {}
-    for column in primary_key.columns:
-        graphql_type = get_graphql_type_from_column(column.type)
-        args[column.name] = GraphQLArgument(GraphQLNonNull(graphql_type))
-
-    return args
+    return {column.name: GraphQLArgument(GraphQLNonNull(get_graphql_type_from_column(column.type))) for column in pk_columns}
 
 
-def make_insert_args(model: DeclarativeMeta, inputs: Inputs) -> GraphQLArgumentMap:
-    return {
-        "objects": GraphQLArgument(GraphQLNonNull(GraphQLList(GraphQLNonNull(get_insert_input_type(model, inputs))))),
-        "on_conflict": GraphQLArgument(get_conflict_input_type(model, inputs)),
+def make_mutation_args(model: DeclarativeMeta, inputs: Inputs, mutation_type: str) -> GraphQLArgumentMap:
+    args = {
+        "insert": {
+            "objects": GraphQLArgument(GraphQLNonNull(GraphQLList(GraphQLNonNull(get_input_type(model, inputs, "insert_input"))))),
+            "on_conflict": GraphQLArgument(get_input_type(model, inputs, "on_conflict")),
+        },
+        "insert_one": {
+            "object": GraphQLArgument(get_input_type(model, inputs, "insert_input")),
+            "on_conflict": GraphQLArgument(get_input_type(model, inputs, "on_conflict")),
+        },
+        "update": {
+            **({"_inc": GraphQLArgument(get_input_type(model, inputs, "inc_input"))} if has_int(model) else {}),
+            "_set": GraphQLArgument(get_input_type(model, inputs, "set_input")),
+            "where": GraphQLArgument(get_input_type(model, inputs, "where")),
+        },
+        "update_by_pk": {
+            **({"_inc": GraphQLArgument(get_input_type(model, inputs, "inc_input"))} if has_int(model) else {}),
+            "_set": GraphQLArgument(get_input_type(model, inputs, "set_input")),
+            **make_pk_args(model),
+        },
+        "delete": {
+            "where": GraphQLArgument(get_input_type(model, inputs, "where")),
+        },
+        "delete_by_pk": {
+            **make_pk_args(model),
+        },
     }
 
-
-def make_insert_one_args(model: DeclarativeMeta, inputs: Inputs) -> GraphQLArgumentMap:
-    return {
-        "object": GraphQLArgument(get_insert_input_type(model, inputs)),
-        "on_conflict": GraphQLArgument(get_conflict_input_type(model, inputs)),
-    }
-
-
-def make_delete_args(model: DeclarativeMeta, inputs: Inputs) -> GraphQLArgumentMap:
-    return {"where": GraphQLArgument(get_where_input_type(model, inputs))}
-
-
-def make_update_args(model: DeclarativeMeta, inputs: Inputs) -> GraphQLArgumentMap:
-    return {
-        "_inc": GraphQLArgument(get_inc_input_type(model, inputs)),
-        "_set": GraphQLArgument(get_set_input_type(model, inputs)),
-        "where": GraphQLArgument(get_where_input_type(model, inputs)),
-    }
-
-
-def make_update_by_pk_args(model: DeclarativeMeta, inputs: Inputs) -> GraphQLArgumentMap:
-    return {
-        "_inc": GraphQLArgument(get_inc_input_type(model, inputs)),
-        "_set": GraphQLArgument(get_set_input_type(model, inputs)),
-        "pk_columns": GraphQLArgument(GraphQLNonNull(get_pk_columns_input(model))),
-    }
+    return args[mutation_type]
