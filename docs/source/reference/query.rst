@@ -1,19 +1,25 @@
-Query
-=====
+Query Reference
+===============
 
-Syntax
-------
+.. contents:: Table of Contents
+   :local:
+
+Query Syntax
+------------
 
 .. parsed-literal::
 
     query [<op-name>] {
-        *object-name* [([:ref:`argument <argument>`])]{
+        <*object-name*> (
+            where: :ref:`bool-exp`
+            order: [:ref:`order-by-exp`!]
+            limit: **Integer**
+            offset: **Integer**
+        ) {
             *object-fields*
         }
-    }
 
-    query [<op-name>] {
-        *object_by_pk* (*key_column*: *value*) {
+        <*object-name*>_by_pk (*key_column*: *value*) {
             *object-fields*
         }
     }
@@ -52,113 +58,45 @@ Example
         }
     }
 
-.. _argument:
 
-Argument
---------
+.. _bool-exp:
 
-.. parsed-literal::
-
-    :ref:`where-exp` | :ref:`order-by-exp` | :ref:`pagination-exp`
-
-
-Expressions
------------
-
-.. _where-exp:
-
-WhereExp
+bool_exp
 """"""""
 
 .. parsed-literal::
 
-    where: :ref:`bool-exp`
+    type <*object-name*>_bool_exp {
+        _and: [:ref:`bool-exp`]
+        _or: [:ref:`bool-exp`]
+        _not: :ref:`bool-exp`
+        *field1*: :ref:`comparison-exp`
+        *field2*: :ref:`comparison-exp`
+    }
+
+
+.. _comparison-exp:
+
+comparison_exp
+""""""""""""""
+
+.. parsed-literal::
+
+    type <*type*>_comparison_exp {
+        :ref:`operator <operator>`: <*type*>
+    }
+
 
 .. _order-by-exp:
 
-OrderByExp
-""""""""""
+order_by_exp
+""""""""""""
 
 .. parsed-literal::
 
-    order: [:ref:`table-order-by-exp`!]
-
-.. _pagination-exp:
-
-PaginationExp
-"""""""""""""
-
-.. parsed-literal::
-
-    limit: **Integer**
-    offset: **Integer**
-
-
-.. _bool-exp:
-
-BoolExp
-"""""""
-
-.. parsed-literal::
-
-    :ref:`and-exp` | :ref:`or-exp` | :ref:`not-exp` | :ref:`column-exp`
-
-.. _and-exp:
-
-AndExp
-""""""
-
-.. parsed-literal::
-
-    {
-        _and: [:ref:`bool-exp`]
-    }
-
-.. _or-exp:
-
-OrExp
-"""""
-
-.. parsed-literal::
-
-    {
-        _or: [:ref:`bool-exp`]
-    }
-
-
-.. _not-exp:
-
-NotExp
-""""""
-
-.. parsed-literal::
-
-    {
-        _not: :ref:`bool-exp`
-    }
-
-
-.. _column-exp:
-
-ColumnExp
-"""""""""
-
-.. parsed-literal::
-
-    {
-        *column-name*: {:ref:`Operator <operator>`: value}
-    }
-
-
-.. _table-order-by-exp:
-
-TableOrderByExp
-"""""""""""""""
-
-.. parsed-literal::
-
-    {
-        *column-name*: :ref:`enum-order-by`
+    type <*object-name*>_order_by {
+        *field1*: :ref:`enum-order-by`
+        *field2*: :ref:`enum-order-by`
     }
 
 .. _operator:
@@ -197,12 +135,12 @@ Enums
 
 .. _enum-order-by:
 
-OrderByEnum
-"""""""""""
+order_by
+""""""""
 
 .. parsed-literal::
 
     **enum** order_by {
-      desc
-      asc
+        desc
+        asc
     }

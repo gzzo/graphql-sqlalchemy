@@ -19,9 +19,14 @@ GraphQL + SQLAlchemy <3
    usage/installation
    usage/quickstart
 
+.. next steps
+.. extending schema
+.. subscription
+
 .. toctree::
    :maxdepth: 1
    :caption: Reference
 
    reference/query
+   reference/mutation
    reference/api
