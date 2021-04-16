@@ -15,7 +15,6 @@ from .graphql_types import get_base_comparison_fields, get_graphql_type_from_col
 from .helpers import get_relationships, get_table
 from .names import (
     get_graphql_type_comparison_name,
-    get_model_conflict_input_name,
     get_model_inc_input_type_name,
     get_model_insert_input_name,
     get_model_order_by_input_name,
@@ -26,6 +25,9 @@ from .names import (
 from .types import Inputs
 
 ORDER_BY_ENUM = GraphQLEnumType("order_by", {"desc": "desc", "asc": "asc"})
+ON_CONFLICT_INPUT = GraphQLInputObjectType("on_conflict_input", {
+        "merge": GraphQLInputField(GraphQLNonNull(GraphQLBoolean)),
+})
 
 
 def get_comparison_input_type(column: Column, inputs: Inputs) -> GraphQLInputObjectType:
@@ -101,20 +103,6 @@ def get_insert_input_type(model: DeclarativeMeta, inputs: Inputs) -> GraphQLInpu
 
     inputs[type_name] = make_model_fields_input_type(model, type_name)
     return inputs[type_name]
-
-
-def get_conflict_input_type(model: DeclarativeMeta, inputs: Inputs) -> GraphQLInputObjectType:
-    type_name = get_model_conflict_input_name(model)
-    if type_name in inputs:
-        return inputs[type_name]
-
-    fields = {
-        "merge": GraphQLInputField(GraphQLNonNull(GraphQLBoolean)),
-    }
-
-    input_type = GraphQLInputObjectType(type_name, fields)
-    inputs[type_name] = input_type
-    return input_type
 
 
 def get_inc_input_type(model: DeclarativeMeta, inputs: Inputs) -> GraphQLInputObjectType:
