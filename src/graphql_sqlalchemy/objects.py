@@ -12,7 +12,7 @@ from graphql import (
 
 from .graphql_types import get_graphql_type_from_column
 from .helpers import get_relationships, get_table
-from .names import get_model_mutation_response_object_name, get_table_name
+from .names import get_field_name, get_table_name
 from .resolvers import make_field_resolver
 from .types import Objects
 
@@ -41,7 +41,7 @@ def build_object_type(model: DeclarativeMeta, objects: Objects) -> GraphQLObject
 
 
 def build_mutation_response_type(model: DeclarativeMeta, objects: Objects) -> GraphQLObjectType:
-    type_name = get_model_mutation_response_object_name(model)
+    type_name = get_field_name(model, "mutation_response")
 
     object_type = objects[get_table_name(model)]
     fields = {
