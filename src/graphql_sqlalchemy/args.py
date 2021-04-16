@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 from .graphql_types import get_graphql_type_from_column
 from .helpers import get_table, has_int
 from .inputs import (
-    get_conflict_input_type,
+    ON_CONFLICT_INPUT,
     get_inc_input_type,
     get_insert_input_type,
     get_order_input_type,
@@ -42,14 +42,14 @@ def make_pk_args(model: DeclarativeMeta) -> GraphQLArgumentMap:
 def make_insert_args(model: DeclarativeMeta, inputs: Inputs) -> GraphQLArgumentMap:
     return {
         "objects": GraphQLArgument(GraphQLNonNull(GraphQLList(GraphQLNonNull(get_insert_input_type(model, inputs))))),
-        "on_conflict": GraphQLArgument(get_conflict_input_type(model, inputs)),
+        "on_conflict": GraphQLArgument(ON_CONFLICT_INPUT),
     }
 
 
 def make_insert_one_args(model: DeclarativeMeta, inputs: Inputs) -> GraphQLArgumentMap:
     return {
         "object": GraphQLArgument(get_insert_input_type(model, inputs)),
-        "on_conflict": GraphQLArgument(get_conflict_input_type(model, inputs)),
+        "on_conflict": GraphQLArgument(ON_CONFLICT_INPUT),
     }
 
 

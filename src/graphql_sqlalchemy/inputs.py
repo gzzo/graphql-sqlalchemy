@@ -17,6 +17,9 @@ from .names import get_field_name
 from .types import Inputs
 
 ORDER_BY_ENUM = GraphQLEnumType("order_by", {"desc": "desc", "asc": "asc"})
+ON_CONFLICT_INPUT = GraphQLInputObjectType("on_conflict_input", {
+        "merge": GraphQLInputField(GraphQLNonNull(GraphQLBoolean)),
+})
 
 
 def get_comparison_input_type(column: Column, inputs: Inputs) -> GraphQLInputObjectType:
