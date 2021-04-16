@@ -52,4 +52,3 @@ def get_field_name(
             return FIELD_NAMES[field_name] % (name, column.name)
 
     return FIELD_NAMES[field_name] % name
-
