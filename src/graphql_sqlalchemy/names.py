@@ -46,10 +46,6 @@ def get_model_mutation_response_object_name(model: DeclarativeMeta) -> str:
     return f"{get_table_name(model)}_mutation_response"
 
 
-def get_model_conflict_input_name(model: DeclarativeMeta) -> str:
-    return f"{get_table_name(model)}_on_conflict"
-
-
 def get_model_constraint_enum_name(model: DeclarativeMeta) -> str:
     return f"{get_table_name(model)}_constraint"
 
