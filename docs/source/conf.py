@@ -65,4 +65,4 @@ html_show_sphinx = False
 
 # -- Intersphinx ---------------------
 
-intersphinx_mapping = {'graphql': ('https://graphql-core-3.readthedocs.io/en/stable', None)}
+intersphinx_mapping = {"graphql": ("https://graphql-core-3.readthedocs.io/en/stable", None)}
