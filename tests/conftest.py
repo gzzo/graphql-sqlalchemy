@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session, scoped_session, sessionmaker
 
 @pytest.fixture(scope="session")
 def db_engine() -> Engine:
-    engine = create_engine("sqlite+pysqlite:///:memory:", echo=True)
+    engine = create_engine("sqlite+pysqlite:///:memory:", echo=False)
 
     yield engine
 

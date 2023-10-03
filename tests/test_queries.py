@@ -79,24 +79,29 @@ def test_all(query_example: Callable[[str], ExecutionResult]) -> None:
     assert author_names == {"Felicitas", "Björk", "Lundth"}
 
 
-def test_highly_rated(query_example: Callable[[str], ExecutionResult]) -> None:
+@pytest.mark.parametrize("double", [True, False])
+def test_highly_rated(query_example: Callable[[str], ExecutionResult], double: bool) -> None:
+    inner = "(where: { rating: { _gt: 4 } })" if double else ""
     data = query_example(
-        """
-        query {
-            author(where: { articles: { rating: { _gt: 4 } } }) {
+        f"""
+        query {{
+            author(where: {{ articles: {{ rating: {{ _gt: 4 }} }} }}) {{
                 id
                 name
-                articles(where: { rating: { _gt: 4 } }) {
+                articles{inner} {{
                     id
                     title
                     rating
-                }
-            }
-        }
+                }}
+            }}
+        }}
         """
     )
     author_names = {author["name"] for author in data["author"]}
-    assert author_names == {"Felicitas", "Björk"}
+    if double:
+        assert author_names == {"Felicitas", "Björk"}
+    else:
+        assert len(author_names) == 3
 
     articles = {article for author in data["author"] for article in author["articles"]}
     article_titles = {article["title"] for article in articles}
