@@ -34,13 +34,16 @@ docs = [
     "sphinx>=3.5.3",
     "sphinx-rtd-theme>=0.5.1",
 ]
-dev = [
-    "codecov",
-    "sqlalchemy-stubs>=0.4"
-]
 
 [project.entry-points."pygments.lexers"]
 graphql = "pygments_graphql:GraphqlLexer"
+
+
+[tool.hatch.envs.default]
+dependencies = [
+    "codecov",
+    "sqlalchemy-stubs>=0.4",
+]
 
 [[tool.hatch.envs.test.matrix]]
 python = ["3.9", "3.10", "3.11"]
@@ -73,6 +76,13 @@ line-length = 120
 
 [tool.ruff]
 line-length = 120
+select = [
+    "E",
+    "W",
+    "F",
+    "UP",
+    "PT",
+]
 
 [build-system]
 requires = ["hatchling"]
