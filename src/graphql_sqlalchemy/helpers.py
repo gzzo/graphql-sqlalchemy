@@ -6,12 +6,12 @@ from sqlalchemy.orm import Mapper, RelationshipProperty
 
 
 def get_table(model: DeclarativeMeta) -> Table:
-    return model.__table__  # type: ignore
+    return model.__table__
 
 
 def get_mapper(model: DeclarativeMeta) -> Mapper:
-    return model.__mapper__  # type: ignore
+    return model.__mapper__
 
 
 def get_relationships(model: DeclarativeMeta) -> List[Tuple[str, RelationshipProperty]]:
-    return get_mapper(model).relationships.items()  # type: ignore
+    return get_mapper(model).relationships.items()

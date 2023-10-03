@@ -8,6 +8,7 @@
 Generate GraphQL Schemas from your SQLAlchemy models
 
 # Install
+
 ```
 pip install graphql-sqlalchemy
 ```
@@ -38,14 +39,7 @@ pip install graphql-sqlalchemy
 
 ```graphql
 query {
-    user(
-        where: {
-            _or: [
-                { id: { _gte: 5 } },
-                { name: { _like: "%bob%" } },
-            ]
-        }
-    ) {
+    user(where: { _or: [{ id: { _gte: 5 } }, { name: { _like: "%bob%" } }] }) {
         id
         name
     }
