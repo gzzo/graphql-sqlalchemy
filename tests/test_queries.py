@@ -10,8 +10,8 @@ from sqlalchemy import Engine, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, registry, relationship
 
 try:
-    ExceptionGroup
-except NameError:
+    from builtins import ExceptionGroup
+except ImportError:
     from exceptiongroup import ExceptionGroup  # type: ignore
 
 
@@ -73,7 +73,7 @@ def query_example(example_session: Session, gql_schema: GraphQLSchema) -> Callab
     def query(source: str) -> Any:
         result = graphql_sync(gql_schema, source, context_value={"session": example_session})
         if result.errors:
-            raise result.errors[0] if len(result.errors) == 1 else ExceptionGroup(result.errors)
+            raise result.errors[0] if len(result.errors) == 1 else ExceptionGroup("Invalid Query", result.errors)
         return result.data
 
     return query
