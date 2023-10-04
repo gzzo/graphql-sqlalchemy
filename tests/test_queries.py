@@ -9,6 +9,11 @@ from graphql_sqlalchemy.schema import build_schema
 from sqlalchemy import Engine, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, registry, relationship
 
+try:
+    ExceptionGroup
+except NameError:
+    from exceptiongroup import ExceptionGroup  # type: ignore
+
 
 class Base(DeclarativeBase):
     registry = registry()
@@ -67,7 +72,8 @@ def example_session(db_engine: Engine, db_session: Session) -> Session:
 def query_example(example_session: Session, gql_schema: GraphQLSchema) -> Callable[[str], Any]:
     def query(source: str) -> Any:
         result = graphql_sync(gql_schema, source, context_value={"session": example_session})
-        assert not result.errors
+        if result.errors:
+            raise result.errors[0] if len(result.errors) == 1 else ExceptionGroup(result.errors)
         return result.data
 
     return query
