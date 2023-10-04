@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Literal
 
 import pytest
 from graphql import ExecutionResult, GraphQLSchema, graphql_sync
@@ -79,16 +79,20 @@ def test_all(query_example: Callable[[str], ExecutionResult]) -> None:
     assert author_names == {"Felicitas", "Björk", "Lundth"}
 
 
-@pytest.mark.parametrize("double", [True, False])
-def test_highly_rated(query_example: Callable[[str], ExecutionResult], double: bool) -> None:
-    inner = "(where: { rating: { _gt: 4 } })" if double else ""
+@pytest.mark.parametrize("filter", ["both", "author", "article"])
+def test_highly_rated(
+    query_example: Callable[[str], ExecutionResult],
+    filter: Literal["both", "author", "article"],
+) -> None:
+    author_filter = "(where: { articles: { rating: { _gt: 4 } } })" if filter != "article" else ""
+    article_filter = "(where: { rating: { _gt: 4 } })" if filter != "author" else ""
     data = query_example(
         f"""
         query {{
-            author(where: {{ articles: {{ rating: {{ _gt: 4 }} }} }}) {{
+            author{author_filter} {{
                 id
                 name
-                articles{inner} {{
+                articles{article_filter} {{
                     id
                     title
                     rating
@@ -98,11 +102,14 @@ def test_highly_rated(query_example: Callable[[str], ExecutionResult], double: b
         """
     )
     author_names = {author["name"] for author in data["author"]}
-    if double:
+    if author_filter:
         assert author_names == {"Felicitas", "Björk"}
     else:
         assert len(author_names) == 3
 
     articles = {article for author in data["author"] for article in author["articles"]}
     article_titles = {article["title"] for article in articles}
-    assert article_titles == {"Felicitas good", "Felicitas better", "Björk good"}
+    if article_filter:
+        assert article_titles == {"Felicitas good", "Felicitas better", "Björk good"}
+    else:
+        assert len(article_titles) == 5
