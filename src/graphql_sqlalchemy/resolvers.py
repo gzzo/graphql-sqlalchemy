@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from functools import partial
 from itertools import starmap
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable
 
 from sqlalchemy import Column, and_, not_, or_, true
 from sqlalchemy.ext.declarative import DeclarativeMeta
@@ -15,7 +17,7 @@ def make_field_resolver(field: str) -> Callable:
     return resolver
 
 
-def get_bool_operation(model_property: Column, operator: str, value: Any) -> Union[bool, ClauseElement]:
+def get_bool_operation(model_property: Column, operator: str, value: Any) -> bool | ClauseElement:
     if operator == "_eq":
         return model_property == value
 
@@ -52,7 +54,7 @@ def get_bool_operation(model_property: Column, operator: str, value: Any) -> Uni
     raise Exception("Invalid operator")
 
 
-def get_filter_operation(model: DeclarativeMeta, where: Dict[str, Any]) -> ClauseElement:
+def get_filter_operation(model: DeclarativeMeta, where: dict[str, Any]) -> ClauseElement:
     partial_filter = partial(get_filter_operation, model)
 
     for name, exprs in where.items():
@@ -72,7 +74,7 @@ def get_filter_operation(model: DeclarativeMeta, where: Dict[str, Any]) -> Claus
     return true()
 
 
-def filter_query(model: DeclarativeMeta, query: Query, where: Optional[Dict[str, Any]] = None) -> Query:
+def filter_query(model: DeclarativeMeta, query: Query, where: dict[str, Any] | None = None) -> Query:
     if not where:
         return query
 
@@ -83,7 +85,7 @@ def filter_query(model: DeclarativeMeta, query: Query, where: Optional[Dict[str,
     return query
 
 
-def order_query(model: DeclarativeMeta, query: Query, order: Optional[List[Dict[str, Any]]] = None) -> Query:
+def order_query(model: DeclarativeMeta, query: Query, order: list[dict[str, Any]] | None = None) -> Query:
     if not order:
         return query
 
@@ -101,11 +103,11 @@ def make_object_resolver(model: DeclarativeMeta) -> Callable:
     def resolver(
         _root: None,
         info: Any,
-        where: Optional[Dict[str, Any]] = None,
-        order: Optional[List[Dict[str, Any]]] = None,
-        limit: Optional[int] = None,
-        offset: Optional[int] = None,
-    ) -> List[DeclarativeMeta]:
+        where: dict[str, Any] | None = None,
+        order: list[dict[str, Any]] | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
+    ) -> list[DeclarativeMeta]:
         session = info.context["session"]
         query = session.query(model)
 
@@ -124,7 +126,7 @@ def make_object_resolver(model: DeclarativeMeta) -> Callable:
 
 
 def make_pk_resolver(model: DeclarativeMeta) -> Callable:
-    def resolver(_root: None, info: Any, **kwargs: Dict[str, Any]) -> DeclarativeMeta:
+    def resolver(_root: None, info: Any, **kwargs: dict[str, Any]) -> DeclarativeMeta:
         session = info.context["session"]
         return session.query(model).get(kwargs)
 
@@ -132,7 +134,7 @@ def make_pk_resolver(model: DeclarativeMeta) -> Callable:
 
 
 def session_add_object(
-    obj: Dict[str, Any], model: DeclarativeMeta, session: Session, on_conflict: Optional[Dict[str, Any]] = None
+    obj: dict[str, Any], model: DeclarativeMeta, session: Session, on_conflict: dict[str, Any] | None = None
 ) -> DeclarativeMeta:
     instance = model()
     for key, value in obj.items():
@@ -155,8 +157,8 @@ def session_commit(session: Session) -> None:
 
 def make_insert_resolver(model: DeclarativeMeta) -> Callable:
     def resolver(
-        _root: None, info: Any, objects: List[Dict[str, Any]], on_conflict: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Union[int, List[DeclarativeMeta]]]:
+        _root: None, info: Any, objects: list[dict[str, Any]], on_conflict: dict[str, Any] | None = None
+    ) -> dict[str, int | list[DeclarativeMeta]]:
         session = info.context["session"]
         models = []
 
@@ -173,7 +175,7 @@ def make_insert_resolver(model: DeclarativeMeta) -> Callable:
 
 def make_insert_one_resolver(model: DeclarativeMeta) -> Callable:
     def resolver(
-        _root: None, info: Any, object: Dict[str, Any], on_conflict: Optional[Dict[str, Any]] = None
+        _root: None, info: Any, object: dict[str, Any], on_conflict: dict[str, Any] | None = None
     ) -> DeclarativeMeta:
         session = info.context["session"]
 
@@ -185,9 +187,7 @@ def make_insert_one_resolver(model: DeclarativeMeta) -> Callable:
 
 
 def make_delete_resolver(model: DeclarativeMeta) -> Callable:
-    def resolver(
-        _root: None, info: Any, where: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Union[int, List[DeclarativeMeta]]]:
+    def resolver(_root: None, info: Any, where: dict[str, Any] | None = None) -> dict[str, int | list[DeclarativeMeta]]:
         session = info.context["session"]
         query = session.query(model)
         query = filter_query(model, query, where)
@@ -202,7 +202,7 @@ def make_delete_resolver(model: DeclarativeMeta) -> Callable:
 
 
 def make_delete_by_pk_resolver(model: DeclarativeMeta) -> Callable:
-    def resolver(_root: None, info: Any, **kwargs: Dict[str, Any]) -> List[DeclarativeMeta]:
+    def resolver(_root: None, info: Any, **kwargs: dict[str, Any]) -> list[DeclarativeMeta]:
         session = info.context["session"]
 
         row = session.query(model).get(kwargs)
@@ -217,8 +217,8 @@ def make_delete_by_pk_resolver(model: DeclarativeMeta) -> Callable:
 def update_query(
     query: Query,
     model: DeclarativeMeta,
-    _set: Optional[Dict[str, Any]],
-    _inc: Optional[Dict[str, Any]],
+    _set: dict[str, Any] | None,
+    _inc: dict[str, Any] | None,
 ) -> int:
     affected = 0
     if _inc:
@@ -238,10 +238,10 @@ def make_update_resolver(model: DeclarativeMeta) -> Callable:
     def resolver(
         _root: None,
         info: Any,
-        where: Dict[str, Any],
-        _set: Optional[Dict[str, Any]],
-        _inc: Optional[Dict[str, Any]],
-    ) -> Dict[str, Union[int, List[DeclarativeMeta]]]:
+        where: dict[str, Any],
+        _set: dict[str, Any] | None,
+        _inc: dict[str, Any] | None,
+    ) -> dict[str, int | list[DeclarativeMeta]]:
         session = info.context["session"]
         query = session.query(model)
         query = filter_query(model, query, where)
@@ -259,10 +259,10 @@ def make_update_by_pk_resolver(model: DeclarativeMeta) -> Callable:
     def resolver(
         _root: None,
         info: Any,
-        pk_columns: Dict[str, Any],
-        _set: Optional[Dict[str, Any]],
-        _inc: Optional[Dict[str, Any]],
-    ) -> Optional[DeclarativeMeta]:
+        pk_columns: dict[str, Any],
+        _set: dict[str, Any] | None,
+        _inc: dict[str, Any] | None,
+    ) -> DeclarativeMeta | None:
         session = info.context["session"]
         query = session.query(model).filter_by(**pk_columns)
 

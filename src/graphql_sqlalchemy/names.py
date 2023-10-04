@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 from graphql import GraphQLList, GraphQLScalarType
 from sqlalchemy import Column
@@ -23,7 +23,7 @@ def get_model_where_input_name(model: DeclarativeMeta) -> str:
     return f"{get_table_name(model)}_bool_exp"
 
 
-def get_graphql_type_comparison_name(graphql_type: Union[GraphQLList[GraphQLScalarType], GraphQLScalarType]) -> str:
+def get_graphql_type_comparison_name(graphql_type: GraphQLList[GraphQLScalarType] | GraphQLScalarType) -> str:
     if isinstance(graphql_type, GraphQLList):
         return f"arr_{graphql_type.of_type.name.lower()}_comparison_exp"
 

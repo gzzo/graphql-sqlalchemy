@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from __future__ import annotations
 
 from sqlalchemy import Table
 from sqlalchemy.ext.declarative import DeclarativeMeta
@@ -13,5 +13,5 @@ def get_mapper(model: DeclarativeMeta) -> Mapper:
     return model.__mapper__
 
 
-def get_relationships(model: DeclarativeMeta) -> List[Tuple[str, RelationshipProperty]]:
+def get_relationships(model: DeclarativeMeta) -> list[tuple[str, RelationshipProperty]]:
     return get_mapper(model).relationships.items()

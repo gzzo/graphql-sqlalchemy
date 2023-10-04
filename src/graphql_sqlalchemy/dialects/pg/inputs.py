@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from graphql import GraphQLEnumType, GraphQLInputField, GraphQLInputObjectType, GraphQLList, GraphQLNonNull
 from sqlalchemy.ext.declarative import DeclarativeMeta
 

@@ -81,9 +81,12 @@ select = [
     "E",
     "W",
     "F",
+    "I",
     "UP",
     "PT",
 ]
+[tool.ruff.isort]
+required-imports = ["from __future__ import annotations"]
 
 [build-system]
 requires = ["hatchling"]
