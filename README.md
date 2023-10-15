@@ -8,6 +8,7 @@
 Generate GraphQL Schemas from your SQLAlchemy models
 
 # Install
+
 ```
 pip install graphql-sqlalchemy
 ```
@@ -18,8 +19,7 @@ pip install graphql-sqlalchemy
     from ariadne.asgi import GraphQL
     from fastapi import FastAPI
     from sqlalchemy import create_engine
-    from sqlalchemy.ext.declarative import declarative_base
-    from sqlalchemy.orm import sessionmaker
+    from sqlalchemy.orm import sessionmaker, declarative_base
     from graphql_sqlalchemy import build_schema
 
     engine = create_engine('sqlite:///config.db')
@@ -38,14 +38,7 @@ pip install graphql-sqlalchemy
 
 ```graphql
 query {
-    user(
-        where: {
-            _or: [
-                { id: { _gte: 5 } },
-                { name: { _like: "%bob%" } },
-            ]
-        }
-    ) {
+    user(where: { _or: [{ id: { _gte: 5 } }, { name: { _like: "%bob%" } }] }) {
         id
         name
     }

@@ -160,4 +160,3 @@ inc_input
         *num-field1*: *num-field1-type*
         *num-field2*: *num-field2-type*
     }
-

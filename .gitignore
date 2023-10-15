@@ -1,6 +1,6 @@
 .idea/
 .tox/
-.pytest_cache/
+.*cache/
 __pycache__/
 pip-wheel-metadata/
 dist/

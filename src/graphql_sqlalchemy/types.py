@@ -1,6 +1,6 @@
-from typing import Dict
+from __future__ import annotations
 
 from graphql import GraphQLInputObjectType, GraphQLObjectType
 
-Objects = Dict[str, GraphQLObjectType]
-Inputs = Dict[str, GraphQLInputObjectType]
+Objects = dict[str, GraphQLObjectType]
+Inputs = dict[str, GraphQLInputObjectType]

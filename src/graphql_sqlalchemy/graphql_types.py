@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from __future__ import annotations
 
 from graphql import (
     GraphQLBoolean,
@@ -15,7 +15,7 @@ from sqlalchemy.dialects.postgresql import ARRAY as PGARRAY
 from sqlalchemy.types import TypeEngine
 
 
-def get_graphql_type_from_column(column_type: TypeEngine) -> Union[GraphQLScalarType, GraphQLList]:
+def get_graphql_type_from_column(column_type: TypeEngine) -> GraphQLScalarType | GraphQLList:
     if isinstance(column_type, Integer):
         return GraphQLInt
 
@@ -31,7 +31,7 @@ def get_graphql_type_from_column(column_type: TypeEngine) -> Union[GraphQLScalar
     return GraphQLString
 
 
-def get_base_comparison_fields(graphql_type: Union[GraphQLScalarType, GraphQLList]) -> Dict[str, GraphQLInputField]:
+def get_base_comparison_fields(graphql_type: GraphQLScalarType | GraphQLList) -> dict[str, GraphQLInputField]:
     return {
         "_eq": GraphQLInputField(graphql_type),
         "_neq": GraphQLInputField(graphql_type),
@@ -45,5 +45,5 @@ def get_base_comparison_fields(graphql_type: Union[GraphQLScalarType, GraphQLLis
     }
 
 
-def get_string_comparison_fields() -> Dict[str, GraphQLInputField]:
+def get_string_comparison_fields() -> dict[str, GraphQLInputField]:
     return {"_like": GraphQLInputField(GraphQLString), "_nlike": GraphQLInputField(GraphQLString)}

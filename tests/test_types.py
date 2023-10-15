@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from graphql import GraphQLInt
 from graphql_sqlalchemy.graphql_types import get_graphql_type_from_column
 from sqlalchemy import Column, Integer
