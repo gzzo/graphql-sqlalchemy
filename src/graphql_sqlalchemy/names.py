@@ -6,7 +6,6 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 
 from .helpers import get_table
 
-
 FIELD_NAMES = {
     "by_pk": "%s_by_pk",
     "order_by": "%s_order_by",
@@ -50,6 +49,7 @@ def get_field_name(
         name = get_table_name(model)
         if isinstance(column, Column) and field_name == "key":
             return FIELD_NAMES[field_name] % (name, column.name)
+
 
 def get_model_order_by_input_name(model: DeclarativeMeta) -> str:
     return f"{get_table_name(model)}_order_by"
