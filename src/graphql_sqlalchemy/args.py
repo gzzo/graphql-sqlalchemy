@@ -2,13 +2,12 @@ from graphql import GraphQLArgument, GraphQLArgumentMap, GraphQLInt, GraphQLList
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
 from .graphql_types import get_graphql_type_from_column
-from .helpers import get_table
+from .helpers import get_table, has_int
 from .inputs import (
     ON_CONFLICT_INPUT,
     get_inc_input_type,
     get_insert_input_type,
     get_order_input_type,
-    get_pk_columns_input,
     get_set_input_type,
     get_where_input_type,
 )
@@ -60,7 +59,7 @@ def make_delete_args(model: DeclarativeMeta, inputs: Inputs) -> GraphQLArgumentM
 
 def make_update_args(model: DeclarativeMeta, inputs: Inputs) -> GraphQLArgumentMap:
     return {
-        "_inc": GraphQLArgument(get_inc_input_type(model, inputs)),
+        **({"_inc": GraphQLArgument(get_inc_input_type(model, inputs))} if has_int(model) else {}),
         "_set": GraphQLArgument(get_set_input_type(model, inputs)),
         "where": GraphQLArgument(get_where_input_type(model, inputs)),
     }
@@ -68,7 +67,7 @@ def make_update_args(model: DeclarativeMeta, inputs: Inputs) -> GraphQLArgumentM
 
 def make_update_by_pk_args(model: DeclarativeMeta, inputs: Inputs) -> GraphQLArgumentMap:
     return {
-        "_inc": GraphQLArgument(get_inc_input_type(model, inputs)),
+        **({"_inc": GraphQLArgument(get_inc_input_type(model, inputs))} if has_int(model) else {}),
         "_set": GraphQLArgument(get_set_input_type(model, inputs)),
-        "pk_columns": GraphQLArgument(GraphQLNonNull(get_pk_columns_input(model))),
+        **make_pk_args(model),
     }

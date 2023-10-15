@@ -3,28 +3,23 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 
 from ...helpers import get_table
 from ...inputs import get_where_input_type
-from ...names import (
-    get_model_column_update_enum_name,
-    get_model_conflict_input_name,
-    get_model_constraint_enum_name,
-    get_model_constraint_key_name,
-)
+from ...names import get_field_name
 from ...types import Inputs
 
 
 def get_constraint_enum(model: DeclarativeMeta) -> GraphQLEnumType:
-    type_name = get_model_constraint_enum_name(model)
+    type_name = get_field_name(model, "constraint")
 
     fields = {}
     for column in get_table(model).primary_key:
-        key_name = get_model_constraint_key_name(model, column, is_primary_key=True)
+        key_name = get_field_name(model, "pkey")
         fields[key_name] = key_name
 
     return GraphQLEnumType(type_name, fields)
 
 
 def get_update_column_enums(model: DeclarativeMeta) -> GraphQLEnumType:
-    type_name = get_model_column_update_enum_name(model)
+    type_name = get_field_name(model, "update_column")
 
     fields = {}
     for column in get_table(model).columns:
@@ -34,7 +29,7 @@ def get_update_column_enums(model: DeclarativeMeta) -> GraphQLEnumType:
 
 
 def get_conflict_type(model: DeclarativeMeta, inputs: Inputs) -> GraphQLInputObjectType:
-    type_name = get_model_conflict_input_name(model)
+    type_name = get_field_name(model, "on_conflict")
     if type_name in inputs:
         return inputs[type_name]
 
