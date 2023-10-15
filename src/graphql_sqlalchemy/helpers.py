@@ -17,4 +17,4 @@ def get_relationships(model: type[DeclarativeBase]) -> list[tuple[str, Relations
 
 
 def has_int(model: type[DeclarativeBase]) -> bool:
-    return any([isinstance(i.type, (Integer, Float)) for i in get_table(model).columns])
+    return any(isinstance(i.type, (Integer, Float)) for i in get_table(model).columns)

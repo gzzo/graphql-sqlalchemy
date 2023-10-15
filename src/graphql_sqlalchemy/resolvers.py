@@ -220,8 +220,8 @@ def make_delete_by_pk_resolver(model: type[DeclarativeBase]) -> Callable:
 def update_query(
     query: Query,
     model: type[DeclarativeBase],
-    _set: dict[str, Any] | None,
-    _inc: dict[str, Any] | None,
+    _set: dict[str, Any] | None = None,
+    _inc: dict[str, Any] | None = None,
 ) -> int:
     affected = 0
     if _inc:

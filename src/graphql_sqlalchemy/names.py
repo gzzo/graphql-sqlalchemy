@@ -7,26 +7,26 @@ from sqlalchemy.orm import DeclarativeBase
 from .helpers import get_table
 
 FIELD_NAMES = {
-    "by_pk": "%s_by_pk",
-    "order_by": "%s_order_by",
-    "where": "%s_bool_exp",
-    "insert": "insert_%s",
-    "insert_one": "insert_%s_one",
-    "insert_input": "%s_insert_input",
-    "mutation_response": "%s_mutation_response",
-    "update": "update_%s",
-    "update_by_pk": "update_%s_by_pk",
-    "delete": "delete_%s",
-    "delete_by_pk": "delete_%s_by_pk",
-    "inc_input": "%s_inc_input",
-    "set_input": "%s_set_input",
-    "comparison": "%s_comparison_exp",
-    "arr_comparison": "arr_%s_comparison_exp",
-    "constraint": "%s_constraint",
-    "update_column": "%s_update_column",
-    "on_conflict": "%s_on_conflict",
-    "pkey": "%s_pkey",
-    "key": "%s_%s_key",
+    "by_pk": "{}_by_pk",
+    "order_by": "{}_order_by",
+    "where": "{}_bool_exp",
+    "insert": "insert_{}",
+    "insert_one": "insert_{}_one",
+    "insert_input": "{}_insert_input",
+    "mutation_response": "{}_mutation_response",
+    "update": "update_{}",
+    "update_by_pk": "update_{}_by_pk",
+    "delete": "delete_{}",
+    "delete_by_pk": "delete_{}_by_pk",
+    "inc_input": "{}_inc_input",
+    "set_input": "{}_set_input",
+    "comparison": "{}_comparison_exp",
+    "arr_comparison": "arr_{}_comparison_exp",
+    "constraint": "{}_constraint",
+    "update_column": "{}_update_column",
+    "on_conflict": "{}_on_conflict",
+    "pkey": "{}_pkey",
+    "key": "{}_{}_key",
 }
 
 
@@ -35,19 +35,18 @@ def get_table_name(model: type[DeclarativeBase] | GraphQLScalarType | GraphQLLis
 
 
 def get_field_name(
-    model: type[DeclarativeBase] | (GraphQLScalarType | GraphQLList),
+    model: type[DeclarativeBase] | GraphQLScalarType | GraphQLList,
     field_name: str,
     column: Column | GraphQLScalarType | GraphQLList | None = None,
 ) -> str:
     if field_name == "comparison":
         if isinstance(model, GraphQLList):
-            return FIELD_NAMES["arr_comparison"] % model.of_type.name.lower()
+            return FIELD_NAMES["arr_comparison"].format(model.of_type.name.lower())
         else:
-            return FIELD_NAMES[field_name] % getattr(model, "name").lower()
-
+            return FIELD_NAMES[field_name].format(getattr(model, "name").lower())
     else:
         name = get_table_name(model)
         if isinstance(column, Column) and field_name == "key":
-            return FIELD_NAMES[field_name] % (name, column.name)
+            return FIELD_NAMES[field_name].format(name, column.name)
 
-    return FIELD_NAMES[field_name] % name
+    return FIELD_NAMES[field_name].format(name)
