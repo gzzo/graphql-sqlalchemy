@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from graphql import GraphQLEnumType, GraphQLInputField, GraphQLInputObjectType, GraphQLList, GraphQLNonNull
-from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy.orm import DeclarativeBase
 
 from ...helpers import get_table
 from ...inputs import get_where_input_type
@@ -9,7 +9,7 @@ from ...names import get_field_name
 from ...types import Inputs
 
 
-def get_constraint_enum(model: DeclarativeMeta) -> GraphQLEnumType:
+def get_constraint_enum(model: type[DeclarativeBase]) -> GraphQLEnumType:
     type_name = get_field_name(model, "constraint")
 
     fields = {}
@@ -20,7 +20,7 @@ def get_constraint_enum(model: DeclarativeMeta) -> GraphQLEnumType:
     return GraphQLEnumType(type_name, fields)
 
 
-def get_update_column_enums(model: DeclarativeMeta) -> GraphQLEnumType:
+def get_update_column_enums(model: type[DeclarativeBase]) -> GraphQLEnumType:
     type_name = get_field_name(model, "update_column")
 
     fields = {}
@@ -30,7 +30,7 @@ def get_update_column_enums(model: DeclarativeMeta) -> GraphQLEnumType:
     return GraphQLEnumType(type_name, fields)
 
 
-def get_conflict_type(model: DeclarativeMeta, inputs: Inputs) -> GraphQLInputObjectType:
+def get_conflict_type(model: type[DeclarativeBase], inputs: Inputs) -> GraphQLInputObjectType:
     type_name = get_field_name(model, "on_conflict")
     if type_name in inputs:
         return inputs[type_name]

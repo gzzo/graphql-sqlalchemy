@@ -1,17 +1,20 @@
 from __future__ import annotations
 
-from sqlalchemy import Table
-from sqlalchemy.ext.declarative import DeclarativeMeta
-from sqlalchemy.orm import Mapper, RelationshipProperty
+from sqlalchemy import Float, Integer, Table
+from sqlalchemy.orm import DeclarativeBase, Mapper, RelationshipProperty
 
 
-def get_table(model: DeclarativeMeta) -> Table:
+def get_table(model: type[DeclarativeBase]) -> Table:
     return model.__table__
 
 
-def get_mapper(model: DeclarativeMeta) -> Mapper:
+def get_mapper(model: type[DeclarativeBase]) -> Mapper:
     return model.__mapper__
 
 
-def get_relationships(model: DeclarativeMeta) -> list[tuple[str, RelationshipProperty]]:
+def get_relationships(model: type[DeclarativeBase]) -> list[tuple[str, RelationshipProperty]]:
     return get_mapper(model).relationships.items()
+
+
+def has_int(model: type[DeclarativeBase]) -> bool:
+    return any([isinstance(i.type, (Integer, Float)) for i in get_table(model).columns])

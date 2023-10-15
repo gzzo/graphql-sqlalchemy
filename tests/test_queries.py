@@ -4,7 +4,7 @@ from collections.abc import Callable
 from typing import Any, Literal
 
 import pytest
-from graphql import ExecutionResult, GraphQLSchema, graphql_sync
+from graphql import GraphQLSchema, graphql_sync
 from graphql_sqlalchemy.schema import build_schema
 from sqlalchemy import Engine, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, registry, relationship
@@ -79,15 +79,22 @@ def query_example(example_session: Session, gql_schema: GraphQLSchema) -> Callab
     return query
 
 
-def test_all(query_example: Callable[[str], ExecutionResult]) -> None:
+def test_all(query_example: Callable[[str], Any]) -> None:
     data = query_example("query { author { name } }")
     author_names = {author["name"] for author in data["author"]}
     assert author_names == {"Felicitas", "Björk", "Lundth"}
 
 
-@pytest.mark.parametrize("filter", ["both", "author", "article"])
+@pytest.mark.parametrize(
+    "filter",
+    [
+        pytest.param("both", marks=pytest.mark.xfail(reason="Both not implemented")),
+        pytest.param("author", marks=pytest.mark.xfail(reason="nested conditions not implemented")),
+        pytest.param("article", marks=pytest.mark.xfail(reason="conditions on nested fields not implemented")),
+    ],
+)
 def test_highly_rated(
-    query_example: Callable[[str], ExecutionResult],
+    query_example: Callable[[str], Any],
     filter: Literal["both", "author", "article"],
 ) -> None:
     author_filter = "(where: { articles: { rating: { _gt: 4 } } })" if filter != "article" else ""

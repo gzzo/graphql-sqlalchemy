@@ -6,8 +6,7 @@ This example sets up a barebones application serving a graphql endpoint. ::
     from ariadne.asgi import GraphQL
     from fastapi import FastAPI
     from sqlalchemy import create_engine
-    from sqlalchemy.ext.declarative import declarative_base
-    from sqlalchemy.orm import sessionmaker
+    from sqlalchemy.orm import declarative_base, sessionmaker
     from graphql_sqlalchemy import build_schema
 
     engine = create_engine('sqlite:///config.db')

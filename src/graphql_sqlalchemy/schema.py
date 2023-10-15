@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from graphql import GraphQLField, GraphQLFieldMap, GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLSchema
-from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy.orm import DeclarativeBase
 
 from .args import (
     make_args,
@@ -28,7 +28,7 @@ from .resolvers import (
 from .types import Inputs, Objects
 
 
-def build_queries(model: DeclarativeMeta, objects: Objects, queries: GraphQLFieldMap, inputs: Inputs) -> None:
+def build_queries(model: type[DeclarativeBase], objects: Objects, queries: GraphQLFieldMap, inputs: Inputs) -> None:
     object_type = build_object_type(model, objects)
 
     objects[object_type.name] = object_type
@@ -43,7 +43,7 @@ def build_queries(model: DeclarativeMeta, objects: Objects, queries: GraphQLFiel
         queries[pk_field_name] = GraphQLField(object_type, args=make_pk_args(model), resolve=make_pk_resolver(model))
 
 
-def build_mutations(model: DeclarativeMeta, objects: Objects, mutations: GraphQLFieldMap, inputs: Inputs) -> None:
+def build_mutations(model: type[DeclarativeBase], objects: Objects, mutations: GraphQLFieldMap, inputs: Inputs) -> None:
     mutation_response_type = build_mutation_response_type(model, objects)
     object_type = objects[get_table_name(model)]
 
@@ -79,7 +79,7 @@ def build_mutations(model: DeclarativeMeta, objects: Objects, mutations: GraphQL
         )
 
 
-def build_schema(base: DeclarativeMeta, enable_subscription: bool = False) -> GraphQLSchema:
+def build_schema(base: type[DeclarativeBase], enable_subscription: bool = False) -> GraphQLSchema:
     """
 
     Args:

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from graphql_sqlalchemy import build_schema
 from sqlalchemy import Boolean, Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
