@@ -203,7 +203,7 @@ def make_delete_resolver(model: type[DeclarativeBase]) -> Callable:
 
 
 def make_delete_by_pk_resolver(model: type[DeclarativeBase]) -> Callable:
-    def resolver(_root: None, info: Any, **kwargs: dict[str, Any]) -> list[type[DeclarativeBase]]:
+    def resolver(_root: None, info: Any, **kwargs: dict[str, Any]) -> list[type[DeclarativeBase]] | None:
         session = info.context["session"]
 
         row = session.query(model).get(kwargs)

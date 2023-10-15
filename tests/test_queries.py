@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from collections.abc import Callable
 from typing import Any, Literal
 
@@ -9,10 +10,8 @@ from graphql_sqlalchemy.schema import build_schema
 from sqlalchemy import Engine, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, registry, relationship
 
-try:
-    from builtins import ExceptionGroup
-except ImportError:
-    from exceptiongroup import ExceptionGroup  # type: ignore
+if sys.version_info < (3, 11):
+    from exceptiongroup import ExceptionGroup
 
 
 class Base(DeclarativeBase):
