@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from sqlalchemy import Table
+from graphql import GraphQLList, GraphQLScalarType
+from sqlalchemy import Table, Integer, Float
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.orm import Mapper, RelationshipProperty
 

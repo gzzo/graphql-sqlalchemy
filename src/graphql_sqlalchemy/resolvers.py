@@ -194,7 +194,7 @@ def make_delete_resolver(model: DeclarativeMeta) -> Callable:
 
         rows = query.all()
         affected = query.delete()
-        session.commit()
+        session_commit(session)
 
         return {"affected_rows": affected, "returning": rows}
 
@@ -206,10 +206,12 @@ def make_delete_by_pk_resolver(model: DeclarativeMeta) -> Callable:
         session = info.context["session"]
 
         row = session.query(model).get(kwargs)
-        session.delete(row)
-        session.commit()
+        if row:
+            session.delete(row)
+            session_commit(session)
+            return row
 
-        return row
+        return None
 
     return resolver
 
@@ -246,6 +248,7 @@ def make_update_resolver(model: DeclarativeMeta) -> Callable:
         query = session.query(model)
         query = filter_query(model, query, where)
         affected = update_query(query, model, _set, _inc)
+        session_commit(session)
 
         return {
             "affected_rows": affected,
@@ -267,6 +270,7 @@ def make_update_by_pk_resolver(model: DeclarativeMeta) -> Callable:
         query = session.query(model).filter_by(**pk_columns)
 
         if update_query(query, model, _set, _inc):
+            session_commit(session)
             return query.one()
 
         return None
