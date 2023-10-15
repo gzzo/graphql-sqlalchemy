@@ -263,9 +263,9 @@ def make_update_by_pk_resolver(model: type[DeclarativeBase]) -> Callable:
     def resolver(
         _root: None,
         info: Any,
-        pk_columns: dict[str, Any],
         _set: dict[str, Any] | None,
         _inc: dict[str, Any] | None,
+        **pk_columns: dict[str, Any],
     ) -> type[DeclarativeBase] | None:
         session = info.context["session"]
         query = session.query(model).filter_by(**pk_columns)
