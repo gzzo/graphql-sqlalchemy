@@ -665,17 +665,6 @@ pygments = "*"
 dev = ["flake8", "pip-tools", "tox"]
 
 [[package]]
-name = "pygments-style-solarized"
-version = "0.1.1"
-description = "Pygments version of the Solarized theme."
-category = "main"
-optional = true
-python-versions = "*"
-
-[package.dependencies]
-pygments = ">=1.5"
-
-[[package]]
 name = "pyparsing"
 version = "2.4.7"
 description = "Python parsing module"
@@ -1092,12 +1081,12 @@ docs = ["sphinx", "jaraco.packaging (>=8.2)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "pytest-enabler", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [extras]
-docs = ["sphinx", "sphinx-rtd-theme", "pygments-graphql", "pygments-style-solarized"]
+docs = ["sphinx", "sphinx-rtd-theme", "pygments-graphql"]
 
 [metadata]
 lock-version = "1.1"
 python-versions = "<4,>=3.6.0"
-content-hash = "6d4cfe331cd633e7723edebb4d4c61220ca68a62e5045e559162d84dc98f0a6b"
+content-hash = "1b99a070bbe1236c59112ef34d2ce9715c5222914eba3cebfe463732ea20bf64"
 
 [metadata.files]
 aiohttp = [
@@ -1548,9 +1537,6 @@ pygments = [
 pygments-graphql = [
     {file = "pygments-graphql-1.0.0.tar.gz", hash = "sha256:a330778d53d0f2b97e9c42573926da6d6f3d6e19748bab1b374d46db1167b9a4"},
     {file = "pygments_graphql-1.0.0-py3-none-any.whl", hash = "sha256:696b727a7933f3273defdfd16d370f36c5c126c8a4903dd6e3fb2dae5a4236b9"},
-]
-pygments-style-solarized = [
-    {file = "pygments-style-solarized-0.1.1.tar.gz", hash = "sha256:7c7c26d2c7787058881f444a7228b0139791bad7e9448e3e0fc3b4bdafcb6f4a"},
 ]
 pyparsing = [
     {file = "pyparsing-2.4.7-py2.py3-none-any.whl", hash = "sha256:ef9d7589ef3c200abe66653d3f1ab1033c3c419ae9b9bdb1240a85b024efc88b"},

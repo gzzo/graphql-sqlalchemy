@@ -20,11 +20,11 @@ sys.path.insert(0, os.path.abspath("../src"))
 # -- Project information -----------------------------------------------------
 
 project = "graphql-sqlalchemy"
-copyright = "2021, graphql-sqlalchemy contributors"
+copyright = ""
 author = "graphql-sqlalchemy contributors"
 
 # The full version, including alpha/beta/rc tags
-release = "0.6.0"
+release = "0.6.2"
 
 
 # -- General configuration ---------------------------------------------------
@@ -42,7 +42,7 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
-pygments_style = "solarizeddark"
+pygments_style = "solarized-dark"
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -62,6 +62,7 @@ html_theme_options = {
 html_static_path = ["_static"]
 
 html_show_sphinx = False
+html_show_copyright = False
 
 # -- Intersphinx ---------------------
 
